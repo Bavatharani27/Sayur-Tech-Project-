@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/themes/redmond/jquery-ui.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/free-jqgrid/4.15.5/css/ui.jqgrid.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/free-jqgrid/4.15.5/jquery.jqgrid.min.js"></script>
+    <style>
+        h1{
+            text-align: center;
+        }
+        h2{
+            padding-left: 40px;
+        }
+        h4{
+            padding-left: 25px;
+        }
+        body{
+            background-color:#e6e6ff;
+        }
+        .col-md-4{
+            padding-left: 60px;
+            font-size:20px;
+        }
+        .Month{
+            padding-left: 600px;
+            position:absolute; left:100px; top:106px;
+        }
+        .reportType{
+            padding-left: 100px;
+            position:absolute; left:100px; top:106px;
+        }
+        .Year{
+            padding-left: 400px;
+            position:absolute; left:100px; top:106px;
+        }
+
+        .date {
+            padding-left: 850px;
+            position:absolute; left:100px; top:105px;
+        }
+        .search {
+            background-color:#92B7F1;
+            width: 55px;
+	        height: 29px;
+	        border: 1px solid #909090;
+            border-radius: 10%;
+            position:absolute; left:1202px; top:230px;
+        }
+        .clear {
+            background-color:#92B7F1;
+            width: 50px;
+	        height: 29px;
+	        border: 1px solid #909090;
+            border-radius: 10%;
+            position:absolute; left:1295px; top:230px;
+        }
+    </style>
+    <title>Summary</title>
+    <h1>RK Hospital</h1>
+    <h2>Summary</h2>
+    <script>
+        function favTutorial() {
+            var mylist = document.getElementById("myList");
+        }
+    </script>
+</head>
+<body>
+    <div class="col-md-4">
+        <form>
+            <div class="Month">
+                <h4>Month</h4>
+                <select id = "myList" onClick = "favTutorial()" >
+                    <option> --select-- </option>
+                    <option> January </option>
+                    <option> February </option>
+                    <option> March </option>
+                    <option> April </option>
+                    <option> May </option>
+                    <option> June </option>
+                    <option> July </option>
+                    <option> Agust </option>
+                    <option> September </option>
+                    <option> October </option>
+                    <option> November </option>
+                    <option> December </option>
+                </select>
+            </div>
+            <div class="date">
+                <h4>Date</h4>
+                <input type="date">
+            </div>
+            <div class="Year">
+                <h4>Year</h4>
+                <select id = "myList" onClick = "favTutorial()" >
+                    <option> --select-- </option>
+                    <option> 2020 </option>
+                    <option> 2021 </option>
+                    <option> 2022 </option>
+                    <option> 2023 </option>
+                </select>
+            </div>
+            
+            <div class="reportType">
+                <h4>Report Type</h4>
+                <select id = "myList" onClick = "favTutorial()" >
+                    <option> --select-- </option>
+                    <option> Doctor Details </option>
+                    <option> Nurse Details </option>
+                    <option> Unworked Doctor Details </option>
+                    <option> OverWorked Doctor Details </option>
+                </select>
+            </div>
+            <div>
+                <button class="search"><b>Search</b></button>
+                <button class="clear"><b>Clear</b></button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
