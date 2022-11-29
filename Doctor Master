@@ -1,0 +1,242 @@
+<html>
+    <head>
+        <script src="https://code.jquery.com/jquery-3.6.1.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js"></script>  
+        <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.js"></script>  
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>  
+        <style>
+            h1{
+                text-align:center;
+            }
+            body{
+                background-color:#e6e6ff;
+            }
+            .docdetails{
+                position:absolute; left:50px; top:100px;
+            }
+            #dob{
+                position:absolute; left:290px; top:36px;
+            }
+            #gender{
+                position:absolute; left:535px; top:36px;
+            }
+            #phno{
+                position:absolute; left:790px; top:36px;
+            }
+            #altphno{
+                position:absolute; left:1050px; top:36px;
+            }
+            #email{
+                position:absolute; top:140px;
+            }
+            #altemail{
+                position:absolute; left:290px; top:140px;
+            }
+            #add1{
+                position:absolute; left:535px; top:140px;
+            }
+            #add2{
+                position:absolute; left:790px; top:140px;
+            }
+            #add3{
+                position:absolute; left:1050px; top:140px;
+            }
+            #city{
+                position:absolute; top:250px;
+            }
+            #state{
+                position:absolute; left:290px; top:250px;
+            }
+            #country{
+                position:absolute; left:535px; top:250px;
+            }
+            #eduqua{
+                position:absolute; left:790px; top:250px;
+            }
+            #exp{
+                position:absolute; left:1050px; top:250px;
+            }
+            #doj{
+                position:absolute; top:340px;
+            }
+            #status{
+                position:absolute; left:290px; top:340px;
+            }
+            .save {
+                background-color:#92B7F1;
+                width: 55px;
+                height: 29px;
+                border: 1px solid #909090;
+                border-radius: 10%;
+                position:absolute; left:1090px; top:340px;
+            }
+            .view {
+                background-color:#92B7F1;
+                width: 55px;
+                height: 29px;
+                border: 1px solid #909090;
+                border-radius: 10%;
+                position:absolute; left:1170px; top:340px;
+            }
+        </style>
+        <script>
+            function favTutorial() {
+                var mylist = document.getElementById("gender");
+            }
+        </script>
+       
+        <script>
+           // $(document).ready(function() {
+            //    $("#city").autocomplete({
+              //      source: '/doctor' // list of items.
+               // });
+            //});
+            /* function suggest(inputString){
+                if(inputString.length == 0) {
+                    $('#suggestions').fadeOut();
+                } else {
+                    $('#city').addClass('load');
+                    $.post("/doctor", {queryString: ""+inputString+""}, function(data){
+                            $('#suggestions').fadeIn();
+                            $('#suggestionsList').html(data); 
+                            $('#suggestionsList').append(data.htmlresponse);
+                            $('#city').removeClass('load');
+                    });
+              }
+            }
+            function fill(thisValue) {
+              $('#city').val(thisValue);
+              setTimeout("$('#suggestions').fadeOut();", 600);
+            } */
+
+            var myVariable = {{ javascript|tojson|safe }};
+
+            var selectCompany = $('#city');
+            
+            selectCompany.empty();
+            $.each(myVariable, function (index, value) {
+                selectCompany.append(
+                    $('<option>', {
+                        value: index,
+                        text: value.name
+                    }, '</option>'))
+            });
+        </script>
+        <script>
+            $(document).ready(function(){
+                $('#btnSave').click(function(e){
+                    var Name = $('#doctorname').val();
+                    var DOB = $('#dob').val();
+                    var Gender = $('#gender').val();
+                    var Phone = $('#altphno').val();
+                    var AltPhone = $('#altaltphno').val();
+                    var Email = $('#email').val();
+                    var AltEmail = $('#altEmail').val();
+                    var Add1 = $('#add1').val();
+                    var Add2 = $('#add2').val();
+                    var Add3 = $('#add3').val();
+                    var CityId = $('#city').val();
+                    var StateId = $('#state').val();
+                    var CountryId = $('#country').val();
+                    var EduQua = $('#eduqua').val();
+                    var Experience = $('#exp').val();
+                    var DOJ = $('#doj').val();
+                    var Status = $('#status').val();
+                    var Created_By = 'Administrator';
+                    var Created_Date = '20221127';
+
+                    var doctor = {'Name':Name, 'DOB':DOB, 'Gender':Gender, 'Phone':Phone, 'AltPhone':AltPhone, 'Email':Email, 'AltEmail':AltEmail,
+                    'Add1':Add1, 'Add2':Add2, 'Add3':Add3,  'CityId':CityId, 'StateId':StateId, 'CountryId':CountryId, 'EduQua':EduQua,
+                    'Experience':Experience, 'DOJ':DOJ, 'Status':Status, 'Created_By':Created_By,'Created_Date': Created_Date};
+                    var doctor_url = "http://127.0.0.1:5000/newDoctor";
+                    $.ajax({
+                        url: doctor_url,
+                        data: doctor,
+                        type: 'POST',
+                        success:function(r){
+                            alert('Saved Successfully');
+                        },
+                        error:function(r){
+                            alert("Error Occured when adding a doctor");
+                        }
+                    });
+                });
+            });
+        </script>
+        <title>Doctor Master</title>
+        <h1>RK Hospital</h1>
+    </head>
+    <body>
+        <div class="docdetails">
+            <label for="doctorname"><b>Doctor Name</b></label><br><br>
+            <input type="text" id="doctorname" name="doctorname" required>
+
+            <label for="dob" style="position:absolute; left:290px;top:0px;"><b>DOB</b></label><br><br>
+            <input type="date" id="dob" required>
+
+            <label for="gender" style="position:absolute; left:535px;top:0px;"><b>Gender</b></label><br><br>
+            <select id = "gender" onClick = "favTutorial()" required>
+                <option> --select-- </option>
+                <option> Male </option>
+                <option> Female </option>
+                <option> Transgender </option>
+            </select>
+
+            <label for="phno" style="position:absolute; left:790px;top:0px;"><b>PhoneNo</b></label><br><br>
+            <input type="number" id="phno" name="phoneNo" required>
+
+            <label for="altphno" style="position:absolute; left:1050px;top:0px;"><b>Alternate PhoneNo</b></label><br><br>
+            <input type="number" id="altphno" name="AltPhoneNo">
+
+            <label for="email" style="position:absolute; top:100px;"><b>Email</b></label><br><br>
+            <input type="email" id="email" name="email" required>
+
+            <label for="alternateemail" style="position:absolute; left:290px; top:100px;"><b>Alternate Email</b></label><br><br>
+            <input type="email" id="altemail" name="alternateemail">
+
+            <label for="add1" style="position:absolute; left:535px; top:100px;"><b>Address1</b></label><br><br>
+            <input type="text" id="add1" name="add1" required>
+
+            <label for="add2" style="position:absolute; left:790px; top:100px;"><b>Address2</b></label><br><br>
+            <input type="text" id="add2" name="add2">
+
+            <label for="add3" style="position:absolute; left:1050px; top:100px;"><b>Address3</b></label><br><br>
+            <input type="text" id="add3" name="add3">
+
+            <!--label for="city" style="position:absolute; top:200px;"><b>City</b></label><br><br>
+            <input type="text" id="city" name="city" onkeyup="suggest(this.value);" onblur="fill();" required !-->
+
+            <!--div class="suggestionsBox" id="suggestions">
+            <div class="suggestionList" id="suggestionsList"> </div>
+            </div !-->
+             <label for="city" style="position:absolute; top:200px;"><b>City</b></label><br><br>
+            <select class="chzn-select" id="city" dname="company">
+                <option value=""></option>    
+            </select>
+
+            <label for="state" style="position:absolute; left:290px; top:200px;"><b>State</b></label><br><br>
+            <input type="text" id="state" name="state">
+
+            <label for="country" style="position:absolute; left:535px; top:200px;"><b>Country</b></label><br><br>
+            <input type="text" id="country" name="country">
+
+            <label for="eduqua" style="position:absolute; left:790px; top:200px;"><b>Educational Qualification</b></label><br><br>
+            <input type="text" id="eduqua" name="eduqua" required>
+
+            <label for="exp" style="position:absolute; left:1050px; top:200px;"><b>Experience</b></label><br><br>
+            <input type="number" id="exp" name="exp" required>
+
+            <label for="doj" style="position:absolute; top:300px;"><b>DOJ</b></label><br><br>
+            <input type="date" id="doj" name="doj" required>
+
+            <label for="status" style="position:absolute; left:290px; top:300px;"><b>Status</b></label><br><br>
+            <select id = "status" onClick = "favTutorial()" required>
+                <option> --select-- </option>
+                <option> Active </option>
+                <option> In Active </option>
+            </select>
+            <button class="save" id="btnSave"><b>Save</b></button>
+            <button class="view"><b>View</b></button>
+        </div>
+    </body>
+</html>
