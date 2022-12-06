@@ -1,0 +1,160 @@
+<html>
+    <head>
+        <script src="https://code.jquery.com/jquery-3.6.1.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/themes/redmond/jquery-ui.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/free-jqgrid/4.15.5/css/ui.jqgrid.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/free-jqgrid/4.15.5/jquery.jqgrid.min.js"></script>
+
+        <style>
+            h1{
+                text-align: center;
+            }
+            body{
+                background-color:#e6e6ff;
+            }
+            #doctorId{
+                width:120px;
+                position:absolute; left:120px;
+                top:110px;
+            }
+            #shiftid{
+                position:absolute; left:360px;
+                top:110px;
+            }
+            #date{
+                position:absolute; left:600px;
+                top:110px;
+            }
+            #patientid{
+                position:absolute; left:900px;
+                top:110px;
+            }
+            .save {
+                background-color:#92B7F1;
+                width: 55px;
+                height: 29px;
+                border: 1px solid #909090;
+                border-radius: 10%;
+                position:absolute; left:1080px; top:170px;
+            }
+            .clear {
+                background-color:#92B7F1;
+                width: 55px;
+                height: 29px;
+                border: 1px solid #909090;
+                border-radius: 10%;
+                position:absolute; left:1165px; top:170px;
+            }
+            .search {
+                background-color:#92B7F1;
+                width: 55px;
+                height: 29px;
+                border: 1px solid #909090;
+                border-radius: 10%;
+                position:absolute; left:1250px; top:170px;
+            }
+        </style>
+        <title>Shift Details</title>
+        <h1><b>RK Hospital<b></h1>
+            <script>
+                $(document).ready(function () {
+                    $("#doctorId").on('click', function(){
+                        $.ajax({
+                            url: "/doctorshift",
+                            success: function(data){
+                                var doctor_name = '';
+                                for (var i = 0; i < data.length; i++) {
+                                    doctor_name += '<option value="' + data[i].id + '">' + data[i].name + "</option>";
+                                }
+                                $("#doctorId").html(doctor_name)
+                            },
+                        });
+                    });
+
+                    $("#shiftid").on('click', function(){
+                        $.ajax({
+                            url: "/shift",
+                            success: function(data){
+                                var shift_name = '';
+                                for (var i = 0; i < data.length; i++) {
+                                    shift_name += '<option value="' + data[i].id + '">' + data[i].name + "</option>";
+                                }
+                                $("#shiftid").html(shift_name)
+                            },
+                        });
+                    });
+
+                    $("#patientid").on('click', function(){
+                        $.ajax({
+                            url: "/patientlist",
+                            success: function(data){
+                                var patient_name = '';
+                                for (var i = 0; i < data.length; i++) {
+                                    patient_name += '<option value="' + data[i].id + '">' + data[i].name + "</option>";
+                                }
+                                $("#patientid").html(patient_name)
+                            },
+                        });
+                    });
+
+                    $('#btnSave').click(function(e){
+                         var DocId = $('#doctorId').val();
+                         var ShiftId = $('#shiftid').val();
+                         var ShiftDt = $('#date').val();
+                         var PatientId = $('#patientid').val();
+     
+                         var doctor_shift = {'DocId':DocId, 'ShiftId':ShiftId, 'ShiftDt':ShiftDt,'PatientId': PatientId};
+                         var doctor_shift_url = "http://127.0.0.1:5000/assignShiftfordoctor";
+                         $.ajax({
+                             url: doctor_shift_url,
+                             data: doctor_shift,
+                             type: 'POST',
+                             success:function(r){
+                                 alert("Success");
+                             },
+                             error:function(r){
+                                 alert("Error Occured when adding a shift");
+                             }
+                         });
+                     });
+                     $('#btnSearch').click(function(e){
+                        $('#tblDoctorShift').jqGrid({
+                            url:'/loaddoctorshift',
+                            datatype: 'json',
+                            colModel:[{name:'Doctor Name'},
+                                    {name: 'Shift Type'}, 
+                                    {name: 'Shift Date'},
+                                    {name: 'Patient Name'}]
+                        });
+                    });
+                });
+            </script>
+    </head>
+    <body>
+        <div class="container">    
+            <div class="row">
+                <div class="col-md-6">
+                    <label style="position:absolute; left:120px; top:80px;">Doctor</label><br><br>
+                    <select name="doctor" id="doctorId"> <option>--select--</option></select>
+
+                    <label style="position:absolute; left:360px; top:80px;">Shift</label><br><br>
+                    <select name="shift" id="shiftid"> 
+                        <option> --select-- </option>
+                    </select>
+
+                    <label style="position:absolute; left:600px; top:80px;">Date</label><br><br>
+                    <input type="date" id="date">
+
+                    <label style="position:absolute; left:900px; top:80px;">Patient</label><br><br>
+                    <select name="patient" id="patientid" title="Select Patient"><option> --select-- </option></select>
+
+                    <table id='tblDoctorShift'></table>
+                    <button class="save" id="btnSave"><b>Save</b></button>
+                    <button class="clear"><b>Clear</b></button>
+                    <button class="search" id="btnSearch"><b>Search</b></button>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
