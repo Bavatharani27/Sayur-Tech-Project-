@@ -6,6 +6,7 @@ mydb = mysql.connector.connect(host="localhost", user="root", password="Admin@17
 mycursor = mydb.cursor(buffered=True)
 
 app = Flask(__name__)
+
 @app.route('/hospital')
 def get_home_page():
     return render_template("hospital.html")
@@ -48,42 +49,6 @@ def login():
         print("Login failed, wrong username or password")
 # login()      
 
-# @app.route("/doctor", methods=["POST", "GET"])
-# def city():
-#     #if request.method == "GET":
-#         citys = []
-#         mycursor.execute("select * from tbl_city")
-#         myresult = mycursor.fetchall()
-#         for i in myresult:
-#             citys.append(i)
-#         # return city
-#         return render_template("doctorMaster.html", citys=citys)
- 
-
-# @app.route("/doctor",methods=["POST","GET"])
-# def ajaxpost():    
-#     global city
-#     if request.method == 'POST':
-#         city = []
-#         queryString = request.form['queryString']
-#         print(queryString)
-#         query = "SELECT * from tbl_city WHERE value LIKE '{}%' LIMIT 10".format(queryString)
-#         mycursor.execute(query)
-#         mycursor.fetchall()
-#     return jsonify({'htmlresponse': render_template('doctorMaster.html', city=city)})
-
-@app.route("/doctor")
-def database():
-    # c, conn = connectionDB()
-
-    compDB = mycursor.execute("SELECT * FROM tbl_city")
-    compDB = mycursor.fetchall()
-
-    return render_template("doctorMaster.html", 
-                            compDB = compDB)
-
-
-
 @app.route('/newDoctor', methods=["POST"])       #Inserting new records in database using post method
 def create_new_doctor():
     global doctor
@@ -114,5 +79,108 @@ def create_new_doctor():
     mycursor.executemany(stmt, doctor)
     mydb.commit()
     return ''
+ 
+@app.route("/doctorshift")
+def get_doctor_list():  
+    doctor = [] 
+    mycursor.execute("select * from tbl_doctor")
+    myresult = mycursor.fetchall()
+    for i in myresult:
+        output = {
+                'id': i[0],
+                'name': i[1]}
+        doctor.append(output)
+    return doctor    
+
+@app.route("/shift")
+def get_shift_list():  
+    shift = [] 
+    mycursor.execute("select * from tbl_shift")
+    myresult = mycursor.fetchall()
+    for i in myresult:
+        output = {
+                'id': i[0],
+                'name': i[4]}
+        shift.append(output)
+    return shift 
+
+@app.route("/patientlist")
+def get_patient_list():  
+    patient = [] 
+    mycursor.execute("select * from tbl_patient")
+    myresult = mycursor.fetchall()
+    for i in myresult:
+        output = {
+                'id': i[0],
+                'name': i[1]}
+        patient.append(output)
+    return patient 
+
+@app.route('/assignShiftfordoctor', methods=["POST"])     
+def create_new_shift_for_doctor():
+    global doctor_shift
+    DocId = request.form.get('DocId')
+    ShiftId = request.form.get('ShiftId')
+    ShiftDt = request.form.get('ShiftDt')
+    PatientId = request.form.get('PatientId')
+    doctor_shift = [(DocId, ShiftId, ShiftDt, PatientId)]
+    stmt = "Insert into tbl_shiftpatientfordoctor (Doctor_Id, Shift_Id, Shift_Date, Patient_Id) values(%s, %s, %s, %s)"
+    mycursor.executemany(stmt, doctor_shift)
+    mydb.commit()
+    return ''
+
+@app.route('/loaddoctorshift')                          
+def get_all_doctorshift():
+    all_doc_shift = []
+    mycursor.execute("select d.txt_Doctor_Name, s.txt_Shift_Type, sd.Shift_Date, p.txt_Patient_Name \
+                     from tbl_shiftpatientfordoctor sd, tbl_doctor d, tbl_patient p, tbl_shift s \
+                     where d.int_Doctor_Id = sd.Doctor_Id and p.int_Patient_Id = sd.Patient_Id and sd.Shift_Id = s.int_Shift_Id")
+    myresult = mycursor.fetchall()
+    for i in myresult:
+        all_doc_shift.append(i)
+    return all_doc_shift
+
+@app.route("/doctorlist")
+def load_doctor_list():
+    return render_template("doctorShiftAssign.html")
+
+@app.route("/getnurselist")
+def get_nurse_shift_list():  
+    nurse = [] 
+    mycursor.execute("select * from tbl_nurse")
+    myresult = mycursor.fetchall()
+    for i in myresult:
+        output = {
+                'id': i[0],
+                'name': i[1]}
+        nurse.append(output)
+    return nurse    
+
+@app.route('/assignShiftfornurse', methods=["POST"])     
+def create_new_shift_for_nurse():
+    global nurse_shift
+    NurseId = request.form.get('NurseId')
+    ShiftId = request.form.get('ShiftId')
+    ShiftDt = request.form.get('ShiftDt')
+    nurse_shift = [(NurseId, ShiftId, ShiftDt)]
+    stmt = "Insert into tbl_shiftfornurse (Nurse_Id, Shift_Id, Shift_Date) values(%s, %s, %s)"
+    mycursor.executemany(stmt, nurse_shift)
+    mydb.commit()
+    return ''
+
+@app.route('/loadnurseshift')                          
+def get_all_nurse_shift():
+    all_nurse_shift = []
+    mycursor.execute("select n.txt_Nurse_Name, s.txt_Shift_Type, sn.Shift_Date, p.txt_Patient_Name \
+                     from tbl_shiftfornurse sn, tbl_nurse n, tbl_patient p, tbl_shift s \
+                     where n.int_Nurse_Id = sn.Nurse_Id and p.int_Patient_Id = sn.Patient_Id and sn.Shift_Id = s.int_Shift_Id")
+    myresult = mycursor.fetchall()
+    for i in myresult:
+        all_nurse_shift.append(i)
+    return all_nurse_shift
+
+@app.route("/nurselist")
+def load_nurse_list():
+    return render_template("nurseShiftAssign.html")
 
 app.run(host='0.0.0.0')
