@@ -1,0 +1,154 @@
+import mysql.connector
+from datetime import datetime
+
+mydb = mysql.connector.connect(host="localhost", user="root", password="Admin@1727!", 
+    database= "hospital_management")
+mycursor = mydb.cursor()
+# mycursor.execute("show tables")
+
+# for i in mycursor:
+#     print(i)
+
+# mycursor.execute("select max(int_Department_Id) from tbl_department")
+# myresult = mycursor.fetchall()
+
+# # for i in myresult:
+# print(myresult)
+
+# total = int(input("Enter the no of records you want to insert: "))
+# for deptId in range(1, total+1):                                                        #department insertion
+#     dept_Name = input("Enter Department Name: ")
+#     query = "Insert into tbl_department (txt_Department_Name) values('{}')".format(dept_Name)
+#     mycursor.execute(query)
+# dept_data = [('Company1', 'Chennai', '90783822', 'company1@gmail.com'),
+#              ('Company2', 'Bangalore', '90783454', 'company2@gmail.com')]
+# stmt = "Insert into tbl_company (txt_Company_Name, txt_Address, txt_Phone, txt_Email) values(%s, %s, %s, %s)"
+# mycursor.executemany(stmt, dept_data)
+    # print(query)
+
+# mydb.commit()
+# print("records inserted successfully")
+
+# for countryId in range(1, total+1):                                                      #country insertion
+#     country_Name = input("Enter Country Name: ")
+#     query = "Insert into tbl_country values({},'{}')".format(countryId, country_Name)
+#     mycursor.execute(query)
+
+# mydb.commit()
+# print("records inserted successfully")
+
+
+# for stateId in range(1, total+1):                                                            #state insertion
+#     state_Name = input("Enter State Name: ")
+#     country_Id = int(input("Enter Country Id: "))
+#     query = "Insert into tbl_state values({},'{}', {})".format(stateId, state_Name, country_Id)
+#     mycursor.execute(query)
+
+# mydb.commit()
+# print("records inserted successfully")
+
+# for cityId in range(1, total+1):                               #city insertion
+#     city_Name = input("Enter City Name: ")
+#     state_Id = int(input("Enter State Id: "))
+#     country_Id = int(input("Enter Country Id: "))
+#     query = "Insert into tbl_city values({},'{}', {}, {})".format(cityId, city_Name, state_Id, country_Id)
+#     mycursor.execute(query)
+
+# mydb.commit()
+# print("records inserted successfully")
+
+
+# for patientId in range(1, total+1):                               #patient details insertion
+#     patient_Name = input("Enter Patient Name: ")
+#     address = input("Enter Address: ")
+#     cityId = int(input("Enter City Id: "))
+#     phone = input("Enter Phone No: ")
+#     query = "Insert into tbl_patient values({},'{}','{}', {}, '{}')".format(patientId, patient_Name, address, cityId, phone)
+#     mycursor.execute(query)
+
+# mydb.commit()
+# print("records inserted successfully")
+
+
+# for compId in range(1, total+1):                               #company details insertion
+#     company_Name = input("Enter Company Name: ")
+#     address = input("Enter Address: ")
+#     query = "Insert into tbl_company (txt_Company_Name, txt_Address) values('{}','{}')".format(company_Name, address)
+#     mycursor.execute(query)
+
+# mydb.commit()
+# print("records inserted successfully")
+
+# for userId in range(1, total+1):                               #user details insertion
+#     user_Name = input("Enter User Name: ")
+#     password = input("Enter Password: ")
+#     dob = int(input("Enter DOB: "))
+#     phone = input("Enter Phone No: ")
+#     email = input("Enter Email: ")
+#     gender = input("Enter Gender: ")
+#     status = input("Enter Status: ")
+#     creted_by = input("Enter Created By: ")
+#     created_date = input("Enter Created Date: ")
+#     query = "Insert into tbl_patient values({},'{}','{}', '{}', '{}', '{}', '{}','{}','{}','{}')".format(userId, user_Name, password, dob, phone, email, gender, status, creted_by, created_date)
+#     mycursor.execute(query)
+
+# mydb.commit()
+# print("records inserted successfully")
+
+# for roleId in range(1, total+1):                               #Role insertion
+#     role_Name = input("Enter Role Name: ")
+#     role_desc = input("Enter Role Description: ")
+#     status = input("Enter Status: ")
+#     creted_by = input("Enter Created By: ")
+#     created_date = input("Enter Created Date: ")
+#     query = "Insert into tbl_role values({},'{}','{}', '{}', '{}', '{}')".format(roleId, role_Name, role_desc, status, creted_by, created_date)
+#     mycursor.execute(query)
+
+
+# dept_data = [('Admin', 'admin123','19900327', '9054235612', 'admin@rkhospital.com', 'M', 'Y', 'Admin', '20221122','', '', '1'),
+#              ('Doctor', 'doctor123','19940208','8945239056', 'doctor@rkhospital.com', 'M', 'Y','Admin', '20221122', '', '', '2'),
+#              ('Nurse', 'nurse123', '19970925', '7890653490', 'nurse@rkhospital.com', 'F', 'Y','Admin', '20221122', '', '', '3')]
+# stmt = "Insert into tbl_users (txt_User_Name, txt_Password, dte_DOB, txt_Phone_No, txt_Email, txt_Gender, txt_Status, txt_Created_By, dte_Created_Date, txt_Updated_By, dte_Updated_Date, int_Role_Id) values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+# mycursor.executemany(stmt, dept_data)
+# print(query)
+
+# mydb.commit()
+# print("records inserted successfully")
+
+# mycursor.execute("select * from tbl_company")
+# myresult = mycursor.fetchall()
+
+# for i in myresult:
+#     print(i)
+    
+    
+shift = [('Select Shift', 'Active', 'Admin', '2022/12/09'),
+         ('Day', 'Active', 'Admin', '2022/12/09'),
+          ('Night', 'Active', 'Admin', '2022/12/09')]
+stmt = "Insert into tbl_shift (txt_Shift_Type, txt_Status, txt_Created_By, dte_Created_Date) values(%s, %s, %s, %s)"
+mycursor.executemany(stmt, shift)
+
+mydb.commit()
+print("records inserted successfully")
+
+# user = [('Select Nurse', '19880323', 'Female', '7890348923', 'kamala@gmail.com', 'Madurai', 'Bsc', 5, '20170124', 'Active', 'Admin', '2022/12/06'),
+#         ('Kamala', '19880323', 'Female', '7890348923', 'kamala@gmail.com', 'Madurai', 'Bsc', 5, '20170124', 'Active', 'Admin', '2022/12/06'),
+#         ('Kavitha', '19901103', 'Female', '9990348923', 'kavitha@gmail.com', 'Aruppukottai', 'Msc', 3, '20221101', 'Active', 'Admin', '2022/12/06'),
+#         ('Geetha', '19920110',  'Female', '7811349023', 'geetha@gmail.com', 'Arappalayam', 'Bsc', 3, '20211001', 'Active', 'Admin', '2022/12/06'),
+#         ('Vani', '19880510',  'Female', '8819049023', 'vani@gmail.com', 'Anna Nagar', 'Msc', 6, '20160214', 'Active', 'Admin', '2022/12/09'),
+#         ('Latha', '19780310',  'Female', '9911349553', 'latha@gmail.com', 'Karur', 'MPhil', 10, '20091201', 'Active', 'Admin', '2022/12/09'),
+#         ('Maha', '20001121',  'Female', '9811349011', 'maha@gmail.com', 'Gandhi Nagar', 'Bsc', 2, '20191023', 'Active', 'Admin', '2022/12/09'),
+#         ('Seetha', '19980710',  'Female', '7934349027', 'seetha@gmail.com', 'Arappalayam', 'Bsc', 3, '20180309', 'Active', 'Admin', '2022/12/09')
+#         ]
+#         ('Kishore', 42, 'Aruppukottai', 'Male', '7890348923', 'kishore@gmail.com', 'Active', 'Admin', '2022/12/01'),
+#         ('Kamala', 28, 'Arappalayam', 'Female', '9911349673', 'kamala@gmail.com', 'Active', 'Admin', '2022/12/01'),
+#         ('Viji', 31, 'Madurai', 'Female', '6897848893', 'viji@gmail.com', 'Active', 'Admin', '2022/12/01'),
+#         ('Vikas', 23, 'Aruppukottai', 'Male', '9090348923', 'vikas@gmail.com', 'Active', 'Admin', '2022/12/01'),
+#         ('Vimala', 55, 'Arappalayam', 'Female', '9816329023', 'vimala@gmail.com', 'Active', 'Admin', '2022/12/01'),
+#         ('Shruthi', 26, 'Arappalayam', 'Female', '6811789023', 'shruthi@gmail.com', 'Active', 'Admin', '2022/12/01')]
+       
+# stmt = "Insert into tbl_nurse (txt_Nurse_Name, dte_DOB, txt_Gender, txt_Phone, txt_Email, txt_Address1, txt_Educational_Qualification, int_Experience, dte_DOJ, txt_Status, txt_Created_By, dte_Created_Date) values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+# mycursor.executemany(stmt, user)
+
+# mydb.commit()
+# print("records inserted successfully")
