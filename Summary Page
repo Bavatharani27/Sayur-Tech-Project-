@@ -4,6 +4,46 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/free-jqgrid/4.15.5/css/ui.jqgrid.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/free-jqgrid/4.15.5/jquery.jqgrid.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#lbldoctor').hide();
+            $('#doctorId').hide();
+            $('#lblnurse').hide();
+            $('#nurseId').hide();
+            $("#doctorId").val(function(){
+                $.ajax({
+                    url: "/doctorshift",
+                    success: function(data){
+                        var doctor_name = '<option value="0"> Select Doctor';
+                        for (var i = 0; i < data.length; i++) {
+                            doctor_name += '<option value="' + data[i].id + '">' + data[i].name + "</option>";
+                        }
+                        $("#doctorId").html(doctor_name);
+                        var x = 10;
+                        x= 15;
+                    },
+                });
+            });
+            $("#nurseId").val(function(){
+                $.ajax({
+                    url: "/getnurselist", 
+                    success: function(data){
+                          var nurse_name = '<option value="0"> Select Nurse';
+                         for (var i = 0; i < data.length; i++) {
+                             nurse_name += '<option value="' + data[i].id + '">' + data[i].name + "</option>";
+                         }
+                         $("#nurseId").html(nurse_name)
+                     },
+                 });
+                });
+            $('#btnClear').click(function(e){
+                $('#myList').val("");
+                $('#fromdate').val("");
+                $('#todate').val("");
+                $('#doctorId').val(""); 
+            });
+        });
+    </script>
     <style>
         h1{
             text-align: center;
@@ -21,22 +61,93 @@
             padding-left: 60px;
             font-size:20px;
         }
-        .Month{
-            padding-left: 600px;
-            position:absolute; left:100px; top:106px;
+        .select{
+            position:absolute; top:140px;
+            padding: 8px 10px;
+            color: #333333;
+            background-color: #eeeeee;
+            border: 1px solid #dddddd;
+            cursor: pointer;
+            border-radius: 5px; 
+    
         }
-        .reportType{
-            padding-left: 100px;
-            position:absolute; left:100px; top:106px;
+        .select:focus,
+        .select:hover{
+            outline:none;
+            border: 1px solid #bbbbbb;
         }
-        .Year{
-            padding-left: 400px;
-            position:absolute; left:100px; top:106px;
+        .select{
+            background: #ffffff;
         }
-
-        .date {
-            padding-left: 850px;
-            position:absolute; left:100px; top:105px;
+        .doctorId{
+            position:absolute; left:900px; top:140px;
+            padding: 8px 30px;
+            color: #333333;
+            background-color: #eeeeee;
+            border: 1px solid #dddddd;
+            cursor: pointer;
+            border-radius: 5px; 
+    
+        }
+        .doctorId:focus,
+        .doctorId:hover{
+            outline:none;
+            border: 1px solid #bbbbbb;
+        }
+        .doctorId{
+            background: #ffffff;
+        }
+        .nurseId{
+            position:absolute; left:900px; top:140px;
+            padding: 8px 30px;
+            color: #333333;
+            background-color: #eeeeee;
+            border: 1px solid #dddddd;
+            cursor: pointer;
+            border-radius: 5px; 
+    
+        }
+        .nurseId:focus,
+        .nurseId:hover{
+            outline:none;
+            border: 1px solid #bbbbbb;
+        }
+        .nurseId{
+            background: #ffffff;
+        }
+        .fromdate{
+            position:absolute; left:370px; top:140px;
+            padding: 8px 30px;
+            color: #333333;
+            background-color: #eeeeee;
+            border: 1px solid #dddddd;
+            cursor: pointer;
+            border-radius: 5px; 
+        }
+        .fromdate:focus,
+        .fromdate:hover{
+            outline:none;
+            border: 1px solid #bbbbbb;
+        }
+        .fromdate{
+            background: #ffffff;
+        }
+        .todate{
+            position:absolute; left:645px; top:140px;
+            padding: 8px 30px;
+            color: #333333;
+            background-color: #eeeeee;
+            border: 1px solid #dddddd;
+            cursor: pointer;
+            border-radius: 5px; 
+        }
+        .todate:focus,
+        .todate:hover{
+            outline:none;
+            border: 1px solid #bbbbbb;
+        }
+        .todate{
+            background: #ffffff;
         }
         .search {
             background-color:#92B7F1;
@@ -44,7 +155,7 @@
 	        height: 29px;
 	        border: 1px solid #909090;
             border-radius: 10%;
-            position:absolute; left:1202px; top:230px;
+            position:absolute; left:1110px; top:230px;
         }
         .clear {
             background-color:#92B7F1;
@@ -52,68 +163,68 @@
 	        height: 29px;
 	        border: 1px solid #909090;
             border-radius: 10%;
-            position:absolute; left:1295px; top:230px;
+            position:absolute; left:1202px; top:230px;
         }
     </style>
     <title>Summary</title>
     <h1>RK Hospital</h1>
-    <h2>Summary</h2>
     <script>
         function favTutorial() {
-            var mylist = document.getElementById("myList");
+            var mylist = $("#myList").val();
+            if(mylist == '0'){
+                $('#lbldoctor').hide();
+                $('#doctorId').val('');
+                $('#doctorId').hide();
+                $('#lblnurse').hide();
+                $('#nurseId').val('');
+                $('#nurseId').hide();
+            }
+            if(mylist == '1' || mylist == '3' || mylist == '4'){
+                $('#lbldoctor').show();
+                $('#doctorId').val('');
+                $('#doctorId').show();
+                $('#lblnurse').hide();
+                $('#nurseId').val('');
+                $('#nurseId').hide();
+            }
+            if(mylist == '2'){
+                $('#lbldoctor').hide();
+                $('#doctorId').val('');
+                $('#doctorId').hide();
+                $('#lblnurse').show();
+                $('#nurseId').val('');
+                $('#nurseId').show();
+            }
         }
     </script>
 </head>
 <body>
     <div class="col-md-4">
         <form>
-            <div class="Month">
-                <h4>Month</h4>
-                <select id = "myList" onClick = "favTutorial()" >
-                    <option> --select-- </option>
-                    <option> January </option>
-                    <option> February </option>
-                    <option> March </option>
-                    <option> April </option>
-                    <option> May </option>
-                    <option> June </option>
-                    <option> July </option>
-                    <option> Agust </option>
-                    <option> September </option>
-                    <option> October </option>
-                    <option> November </option>
-                    <option> December </option>
+            <div class="container">
+                <label style="position:absolute; top:100px;"><b>Report Type</b></label><br><br> 
+                <select id = "myList" onChange = "favTutorial()" class="select">
+                    <option value="0"> --select-- </option>
+                    <option value="1"> Doctor Details </option>
+                    <option value="2"> Nurse Details </option>
+                    <option value="3"> Unworked Doctor Details </option>
+                    <option value="4"> OverWorked Doctor Details </option>
                 </select>
-            </div>
-            <div class="date">
-                <h4>Date</h4>
-                <input type="date">
-            </div>
-            <div class="Year">
-                <h4>Year</h4>
-                <select id = "myList" onClick = "favTutorial()" >
-                    <option> --select-- </option>
-                    <option> 2020 </option>
-                    <option> 2021 </option>
-                    <option> 2022 </option>
-                    <option> 2023 </option>
-                </select>
-            </div>
-            
-            <div class="reportType">
-                <h4>Report Type</h4>
-                <select id = "myList" onClick = "favTutorial()" >
-                    <option> --select-- </option>
-                    <option> Doctor Details </option>
-                    <option> Nurse Details </option>
-                    <option> Unworked Doctor Details </option>
-                    <option> OverWorked Doctor Details </option>
-                </select>
-            </div>
-            <div>
+
+                <label style="position:absolute; left:370px; top:100px;"><b>From Date</b></label><br><br> 
+                <input type="date" id="fromdate" class="fromdate">
+
+                <label style="position:absolute; left:645px; top:100px;"><b>To Date</b></label><br><br> 
+                <input type="date"  id="todate" class="todate">
+
+                <label style="position:absolute; left:900px; top:100px;" id="lbldoctor"><b>Doctor</b></label><br><br>
+                <select name="doctor" id="doctorId" class="doctorId"> </select>
+
+                <label style="position:absolute; left:900px; top:100px;" id="lblnurse"><b>Nurse</b></label><br><br>
+                <select name="doctor" id="nurseId" class="nurseId"> </select>
+                    
                 <button class="search"><b>Search</b></button>
-                <button class="clear"><b>Clear</b></button>
-            </div>
+                <button class="clear" id="btnClear"><b>Clear</b></button>
         </form>
     </div>
 </body>
