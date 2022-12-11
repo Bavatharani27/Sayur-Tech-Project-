@@ -16,9 +16,9 @@ def get_home_page():
 def get_login_page():
     return render_template("LoginPage.html")
 
-# @app.route('/summary')
-# def get_summary_page():
-#     return render_template("summary.html")
+@app.route('/summary')
+def get_summary_page():
+    return render_template("summary.html")
 
 @app.route('/userlogin', methods=["POST", "GET"])
 def login():
@@ -134,7 +134,8 @@ def get_all_doctorshift():
     all_doc_shift = []
     mycursor.execute("select d.txt_Doctor_Name, s.txt_Shift_Type, sd.Shift_Date, p.txt_Patient_Name \
                      from tbl_shiftpatientfordoctor sd, tbl_doctor d, tbl_patient p, tbl_shift s \
-                     where d.int_Doctor_Id = sd.Doctor_Id and p.int_Patient_Id = sd.Patient_Id and sd.Shift_Id = s.int_Shift_Id")
+                     where d.int_Doctor_Id = sd.Doctor_Id and p.int_Patient_Id = sd.Patient_Id and sd.Shift_Id = s.int_Shift_Id and \
+                      d.int_Doctor_Id = @int_Doctor_Id")
     myresult = mycursor.fetchall()
     for i in myresult:
         all_doc_shift.append(i)
@@ -168,15 +169,49 @@ def create_new_shift_for_nurse():
     mydb.commit()
     return ''
 
-@app.route('/loadnurseshift')                          
+@app.route('/loadnurseshift', methods=["POST","GET"])                          
 def get_all_nurse_shift():
     all_nurse_shift = []
-    mycursor.execute("select n.txt_Nurse_Name, s.txt_Shift_Type, sn.Shift_Date, p.txt_Patient_Name \
-                     from tbl_shiftfornurse sn, tbl_nurse n, tbl_patient p, tbl_shift s \
-                     where n.int_Nurse_Id = sn.Nurse_Id and p.int_Patient_Id = sn.Patient_Id and sn.Shift_Id = s.int_Shift_Id")
-    myresult = mycursor.fetchall()
-    for i in myresult:
-        all_nurse_shift.append(i)
+    global nurse_shift
+    NurseId = request.form.get('NurseId')
+    ShiftId = request.form.get('ShiftId')
+    ShiftDt = request.form.get('ShiftDt')
+    nurse_shift1 = [NurseId, ShiftId, ShiftDt]
+    nurse_shift2 = [NurseId, ShiftId]
+    nurse_shift3 = [NurseId]
+    
+    if(NurseId != 'null'):
+        if(ShiftId != '0'):
+            if(ShiftDt != ''):
+                mycursor.execute("select n.txt_Nurse_Name, s.txt_Shift_Type, CAST(sn.Shift_Date AS date) as Sdate \
+                                    from tbl_shiftfornurse sn, tbl_nurse n, tbl_shift s \
+                                    where n.int_Nurse_Id = sn.Nurse_Id and sn.Shift_Id = s.int_Shift_Id and n.int_Nurse_Id = %s and \
+                                        s.int_Shift_Id = %s and sn.Shift_Date = %s", (nurse_shift1))
+                myresult = mycursor.fetchall()
+                for i in myresult:
+                    all_nurse_shift.append(i)
+            else:
+                mycursor.execute("select n.txt_Nurse_Name, s.txt_Shift_Type, CAST(sn.Shift_Date AS date) as Sdate \
+                                    from tbl_shiftfornurse sn, tbl_nurse n, tbl_shift s \
+                                    where n.int_Nurse_Id = sn.Nurse_Id and sn.Shift_Id = s.int_Shift_Id and n.int_Nurse_Id = %s and \
+                                        s.int_Shift_Id = %s", (nurse_shift2))
+                myresult = mycursor.fetchall()
+                for i in myresult:
+                    all_nurse_shift.append(i)
+        else:
+            mycursor.execute("select n.txt_Nurse_Name, s.txt_Shift_Type, CAST(sn.Shift_Date AS date) as Sdate \
+                                from tbl_shiftfornurse sn, tbl_nurse n, tbl_shift s \
+                                where n.int_Nurse_Id = sn.Nurse_Id and sn.Shift_Id = s.int_Shift_Id and n.int_Nurse_Id = %s", (nurse_shift3))
+            myresult = mycursor.fetchall()
+            for i in myresult:
+                all_nurse_shift.append(i)
+    else:
+            mycursor.execute("select n.txt_Nurse_Name, s.txt_Shift_Type, CAST(sn.Shift_Date AS date) as Sdate \
+                                from tbl_shiftfornurse sn, tbl_nurse n, tbl_shift s \
+                                where n.int_Nurse_Id = sn.Nurse_Id and sn.Shift_Id = s.int_Shift_Id")
+            myresult = mycursor.fetchall()
+            for i in myresult:
+                all_nurse_shift.append(i)
     return all_nurse_shift
 
 @app.route("/nurselist")
