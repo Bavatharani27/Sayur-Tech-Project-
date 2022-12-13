@@ -2,93 +2,96 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-body {font-family: Arial, Helvetica, sans-serif;
-    background-color:#000080;}
-
-input[type=text], input[type=password] {
-  width: 100%;
-  padding: 12px 20px;
-  length:50%;
-  margin: 8px 0;
-  display: inline-block;
-  box-sizing: border-box;
-}
-
-button {
-  background-color: #92B7F1;
-  color: black;
-  padding: 14px 20px;
-  margin: 8px 0;
-  border: none;
-  cursor: pointer;
-  width: 100%;
-}
-
-button:hover {
-  opacity: 0.8;
-}
-.imgcontainer {
-  text-align: center;
-  margin: 55px 0 12px 0;
-}
-
-img.avatar {
-  width: 10%;
-  border-radius: 50%;
-}
-.container {
-  padding: 10px 16px 0 450px;
-  width:500px;
-}
-.cancontainer {
-    padding: 0 16px 0 710px;
-    width:100px;
-}
-.cancelbtn {
-    padding: 14px 10px;
-    width:100px;
-    position:relative;
-    left:210px;
-    background-color: #92B7F1;
-    color:black;
-  }
-span.psw {
-  float: right;
-  padding-top: 16px;
-  position:relative;
-  left:100px;
-  width:150px;
-  color:white;
-}
-</style>
 <script src="https://code.jquery.com/jquery-3.6.1.js"></script>
-<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js">
-  $(document).ready(function(){
-    $('#btnLogin').on('click', function(e){
-      // var Id = $('#txtId').val();
-      var login_username = $('#txtUserName').val();
-      var login_password = $('#txtPassword').val();
+<script>
+    $(document).ready(function () {
+        $('#btnLogin').click(function(e){
+          var username = $('#txtUserName').val();
+          var password = $('#txtPassword').val();
 
-      var loginUser = {'login_username':login_username, 'login_password':login_password};
-      var login_url = "http://127.0.0.1:5000/userlogin";
-      $.ajax({
-          url: login_url,
-          type: 'POST',
-          data: loginUser, 
-          success:function(r){
-            alert("success");
-          },
-          error:function(r){
-              alert("error");
-          }
-      });
-    });
-});
+          var loginUser = {'username':username, 'password':password};
+          var login_url = "/userlogin";
+          $.ajax({
+              url: login_url,
+            //  data:loginUser, 
+            //  datatype: "json",
+           //   type: 'POST',
+              success:function(r){
+                for(var index in r){
+                  if(r[index][0] == username && r[index][1] == password){
+                    location.href = ('/admin');
+                  }
+                }
+              },
+              error:function(r){
+                  alert("error");
+              }
+          });
+        });
+     });
 </script>
+<style>
+    body {font-family: Arial, Helvetica, sans-serif;
+        background-color:#000080;}
+
+    input[type=text], input[type=password] {
+      width: 100%;
+      padding: 12px 20px;
+      length:50%;
+      margin: 8px 0;
+      display: inline-block;
+      box-sizing: border-box;
+    }
+
+    button {
+      background-color: #92B7F1;
+      color: black;
+      padding: 14px 20px;
+      margin: 8px 0;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    button:hover {
+      opacity: 0.8;
+    }
+    .imgcontainer {
+      text-align: center;
+      margin: 55px 0 12px 0;
+    }
+
+    img.avatar {
+      width: 10%;
+      border-radius: 50%;
+    }
+    .container {
+      padding: 10px 16px 0 450px;
+      width:500px;
+    }
+    .cancontainer {
+        padding: 0 16px 0 710px;
+        width:100px;
+    }
+    .cancelbtn {
+        padding: 14px 10px;
+        width:100px;
+        position:relative;
+        left:210px;
+        background-color: #92B7F1;
+        color:black;
+      }
+    span.psw {
+      float: right;
+      padding-top: 16px;
+      position:relative;
+      left:100px;
+      width:150px;
+      color:white;
+    }
+</style>
 </head>
 <body> 
-<form style="background-color:#000080;">
   <div class="imgcontainer">
     <img src='https://i.postimg.cc/HLrWDRjF/c.png' border='0' class="avatar" alt='Avatar'/>
   </div>
@@ -100,13 +103,12 @@ span.psw {
     <label for="psw" style="color:white;"><b>Password</b></label>
     <input type="password" id="txtPassword" placeholder="Enter Password" name="psw" required style="width:420px;">
         
-    <button id="btnLogin" style="width:100px;">Login</button>
+    <button class="loginbtn" id="btnLogin" style="width:100px;">Login</button>
     <button class="cancelbtn">Cancel</button>
   </div>
 
   <div class="cancontainer" style="background-color:#000080">
     <span class="psw"><b>Forgot</b> <a href="#" style="color: pink;">password?</a></span>
   </div>
-</form>
 </body>
 </html>
