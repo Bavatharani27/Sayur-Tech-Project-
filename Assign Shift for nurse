@@ -62,6 +62,7 @@
                     var NurseId = $('#nurseid').val();
                     var ShiftId = $('#shiftid').val();
                     var ShiftDt = $('#date').val(); 
+                    ShiftDt = ShiftDt.substring(0,4) + '-'+ ShiftDt.substring(5,7) +'-'+ ShiftDt.substring(8,10);
                     var nurse_shift = {'NurseId':NurseId, 'ShiftId':ShiftId, 'ShiftDt':ShiftDt};
                     $('#tblNurseShift').jqGrid({
                         url:'/loadnurseshift',
@@ -170,13 +171,10 @@
             <div class="row">
                 <div class="col-md-6">
                     <label style="position:absolute; top:30px;">Nurse</label><br><br>
-                    <select name="nurse" id="nurseid" class="select" title="Select your option">
-                       
-                    </select>
+                    <select name="nurse" id="nurseid" class="select"></select>
+                    
                     <label style="position:absolute; left:350px; top:30px;">Shift</label><br><br>
-                    <select name="shift" id="shiftid" class="select"> 
-                        <option value="" disabled selected>Select Shift</option>
-                    </select>
+                    <select name="shift" id="shiftid" class="select"></select>
 
                     <label style="position:absolute; left:650px; top:30px;">Date</label><br><br>
                     <input type="date" id="date" class="date">
