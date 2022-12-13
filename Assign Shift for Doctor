@@ -14,20 +14,24 @@
                 background-color:#e6e6ff;
             }
             #doctorId{
-                width:120px;
-                position:absolute; left:120px;
+                width:170px;
+                position:absolute; left:70px;
                 top:110px;
             }
             #shiftid{
-                position:absolute; left:360px;
+                position:absolute; left:330px;
                 top:110px;
             }
             #date{
-                position:absolute; left:600px;
+                position:absolute; left:560px;
                 top:110px;
             }
             #patientid{
-                position:absolute; left:900px;
+                position:absolute; left:825px;
+                top:110px;
+            }
+            #attendflag{
+                position:absolute; left:1050px;
                 top:110px;
             }
             .save {
@@ -36,7 +40,7 @@
                 height: 29px;
                 border: 1px solid #909090;
                 border-radius: 10%;
-                position:absolute; left:1080px; top:170px;
+                position:absolute; left:1080px; top:190px;
             }
             .clear {
                 background-color:#92B7F1;
@@ -44,7 +48,7 @@
                 height: 29px;
                 border: 1px solid #909090;
                 border-radius: 10%;
-                position:absolute; left:1165px; top:170px;
+                position:absolute; left:1165px; top:190px;
             }
             .search {
                 background-color:#92B7F1;
@@ -52,10 +56,10 @@
                 height: 29px;
                 border: 1px solid #909090;
                 border-radius: 10%;
-                position:absolute; left:1250px; top:170px;
+                position:absolute; left:1250px; top:190px;
             }
             .grid {
-                position:absolute; left:210px; top:165px;
+                position:absolute; left:110px; top:210px;
             }
             .select{
                 padding: 8px 30px;
@@ -140,9 +144,11 @@
                          var DocId = $('#doctorId').val();
                          var ShiftId = $('#shiftid').val();
                          var ShiftDt = $('#date').val();
+                         ShiftDt = ShiftDt.substring(0,4) + '-'+ ShiftDt.substring(5,7) +'-'+ ShiftDt.substring(8,10);
                          var PatientId = $('#patientid').val();
+                         var AttendFlag = $('#attendflag').val();
      
-                         var doctor_shift = {'DocId':DocId, 'ShiftId':ShiftId, 'ShiftDt':ShiftDt,'PatientId': PatientId};
+                         var doctor_shift = {'DocId':DocId, 'ShiftId':ShiftId, 'ShiftDt':ShiftDt,'PatientId': PatientId, 'AttendFlag': AttendFlag};
                          var doctor_shift_url = "http://127.0.0.1:5000/assignShiftfordoctor";
                          $.ajax({
                              url: doctor_shift_url,
@@ -156,21 +162,33 @@
                              }
                          });
                      });
-                     $('#btnSearch').click(function(e){
+
+                    $('#btnSearch').click(function(e){
+                        var DoctorId = $('#doctorId').val();
+                        var ShiftId = $('#shiftid').val();
+                        var ShiftDt = $('#date').val(); 
+                        var PatientId = $('#patientid').val(); 
+                        var AttendFlag = $('#attendflag').val(); 
+
+                        var doctor_shift = {'DoctorId':DoctorId, 'ShiftId':ShiftId, 'ShiftDt':ShiftDt, 'PatientId':PatientId, 'AttendFlag': AttendFlag};
                         $('#tblDoctorShift').jqGrid({
                             url:'/loaddoctorshift',
-                            datatype: 'json',
+                            postData: doctor_shift,
+                            datatype: "json",
+                            mtype: 'POST',
                             colModel:[{name:'Doctor Name'},
                                     {name: 'Shift Type'}, 
                                     {name: 'Shift Date', width: 350},
-                                    {name: 'Patient Name'}]
+                                    {name: 'Patient Name'},
+                                    {name: 'Attended Flag'}]
                         });
-                    });
+                    }); 
                     $('#btnClear').click(function(e){
                         $('#doctorId').val("");
                         $('#shiftid').val("");
                         $('#date').val(""); 
                         $('#patientid').val(""); 
+                        $('#attendflag').val(""); 
                         $('#tblDoctorShift').GridUnload(""); 
                     });
                 });
@@ -180,20 +198,24 @@
         <div class="container">    
             <div class="row">
                 <div class="col-md-6">
-                    <label style="position:absolute; left:120px; top:80px;">Doctor</label><br><br>
-                    <select name="doctor" id="doctorId" class="select" Placeholder="Select your option"> 
-                        <option>Select your option</option></select>
+                    <label style="position:absolute; left:70px; top:80px;">Doctor</label><br><br>
+                    <select name="doctor" id="doctorId" class="select"> </select>
+                    
+                    <label style="position:absolute; left:330px; top:80px;">Shift</label><br><br>
+                    <select name="shift" id="shiftid" class="select"></select>
 
-                    <label style="position:absolute; left:360px; top:80px;">Shift</label><br><br>
-                    <select name="shift" id="shiftid" class="select"> 
-                        <option> --select-- </option>
-                    </select>
-
-                    <label style="position:absolute; left:600px; top:80px;">Date</label><br><br>
+                    <label style="position:absolute; left:560px; top:80px;">Date</label><br><br>
                     <input type="date" id="date" class="date">
 
-                    <label style="position:absolute; left:900px; top:80px;">Patient</label><br><br>
+                    <label style="position:absolute; left:825px; top:80px;">Patient</label><br><br>
                     <select name="patient" id="patientid" class="select"><option> --select-- </option></select>
+
+                    <label style="position:absolute; left:1050px; top:80px;">Attend Flag</label><br><br>
+                    <select name="patient" id="attendflag" class="select">
+                        <option value='0'> --select-- </option>
+                        <option value='1'> Yes </option>
+                        <option value='2'> No </option>
+                    </select>
                 
                     <button class="save" id="btnSave"><b>Save</b></button>
                     <button class="clear" id="btnClear"><b>Clear</b></button>
