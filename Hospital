@@ -285,6 +285,7 @@ body {font-family: Arial;}
     body {
       font-family: Arial, Helvetica, sans-serif;
       margin: 0;
+      background-image:url(https://www.consensusortho.com/wp-content/uploads/2019/10/Blog-Website-Header_Location-of-Patients.png);
       }
 
     html {
