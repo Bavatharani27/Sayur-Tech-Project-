@@ -1,0 +1,31 @@
+<html>
+    <head>
+        <title>Admin Page</title>
+        <h1>RK Hospital</h1>
+        <style>
+            h1{
+                text-align: center;
+            }
+            body{
+                background-image:url("https://img.freepik.com/free-vector/clean-medical-background_53876-97927.jpg?w=2000");
+                background-repeat: no-repeat;
+                background-attachment: fixed;
+            }
+            .container{
+                padding-left:550px;
+                padding-top:90px;
+                font-size: 45px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <ul>
+                <li><a href="#" onclick="location.href = 'http:/summary';" id="summary">Summary</a></li>
+                <li><a href="#" onclick="location.href = 'http:/doctorlist';" id="doctor">Doctors</a></li>
+                <li><a href="#" onclick="location.href = 'http:/nurselist';" id="nurse">Nurses</a></li>
+                <!--li><a href="#">Out Patients</a></li!-->
+              </ul>
+        </div>
+    </body>
+</html>
