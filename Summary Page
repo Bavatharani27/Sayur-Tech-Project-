@@ -56,6 +56,9 @@
         }
         body{
             background-color:#e6e6ff;
+            background-image:url(https://img.freepik.com/free-vector/clean-medical-background-vector_53876-140865.jpg?w=2000);
+            background-repeat: no-repeat;
+            
         }
         .col-md-4{
             padding-left: 60px;
