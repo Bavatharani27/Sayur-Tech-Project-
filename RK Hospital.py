@@ -18,43 +18,26 @@ def get_summary_page():
 @app.route('/userlogin', methods=["GET", "POST"])
 def login():
     User = [] 
-    # login_username = request.form.get('username')
-    # login_password = request.form.get('password')
-    # login = [login_username, login_password]
-    mycursor.execute("select txt_User_Name, txt_Password from tbl_users") # where txt_User_Name = %s and txt_Password = %s", (login))
+    login_username = request.form.get('username')
+    login_password = request.form.get('password')
+    login = [login_username, login_password]
+    mycursor.execute("select int_User_Id, txt_User_Name, txt_Password from tbl_users where txt_User_Name = %s and txt_Password = %s", (login))
     myresult = mycursor.fetchall()
     for i in myresult:
         User.append(i)
     return User 
-    # mycursor.execute("USE hospital_management")
-    # login_username = request.form.get('login_username')
-    # login_password = request.form.get('login_password')
-
-    # check_login = f"select txt_User_Name from tbl_users where txt_User_Name = '{login_username}'"
-    # check_password = f"select txt_Password from tbl_users where txt_Password = '{login_password}'"
-    # mycursor.execute(check_login)
-    # username_result = mycursor.fetchone()
-
-    # mycursor.execute(check_password)
-    # password_result = mycursor.fetchone()
-
-    # password = str(*password_result).replace('', '')
-    # username = str(*username_result).replace('', '')
-    
-    # print(*username, sep=',')
-    # print (*username)
-    # print (*password)
-    # print(*password, sep=',')
-
-    # if login_password == password and login_username == username:
-    #     # print("Success")
-    #     return render_template("summary.html")
-    # else: 
-    #     print("Login failed, wrong username or password")
 #login()      
 @app.route('/login')
 def get_login_page():
     return render_template("LoginPage.html")
+
+@app.route('/doctorlogin')
+def get_doctor_login_page():
+    return render_template("DoctorLogin.html")
+
+@app.route('/doctorpage')
+def get_doctor_page():
+    return render_template("DoctorPage.html")
 
 @app.route('/admin')
 def get_admin_page():
