@@ -110,6 +110,30 @@ def get_patient_list():
         patient.append(output)
     return patient 
 
+@app.route("/assignedpatientlist/<int:DoctorId>")
+def get_assigned_patient_list(DoctorId):  
+    patients = [] 
+    logged_doctor_Id = ''
+    #DoctorId  = request.form.get('DoctorId')
+    
+    DocId = "select int_Doctor_Id from tbl_doctor where int_User_Id = " + str(DoctorId)
+    mycursor.execute(DocId)
+    myresult = mycursor.fetchone()
+    for i in myresult:
+        logged_doctor_Id = str(i)
+        
+    assigned_patients = "select int_Patient_Id, txt_Patient_Name from tbl_patient p, tbl_shiftpatientfordoctor sd \
+                        where int_Patient_Id = Patient_Id and Doctor_Id = " + logged_doctor_Id
+                        
+    mycursor.execute(assigned_patients)
+    myresult = mycursor.fetchall()
+    for i in myresult:
+        output = {
+                'id': i[0],
+                'name': i[1]}
+        patients.append(output)
+    return patients 
+
 @app.route('/assignShiftfordoctor', methods=["POST"])     
 def create_new_shift_for_doctor():
     global doctor_shift
@@ -152,7 +176,7 @@ def get_all_doctorshift():
         shift_clause = ' and s.int_Shift_Id = '+ ShiftId 
     
     if(ShiftDt != '--' and ShiftDt != ''):
-        date_clause = ' and sd.Shift_Date = '+ ShiftDt
+        date_clause = ' and sd.Shift_Date = "'+ ShiftDt + '"'
         
     if(PatientId != '0' and PatientId != ''):
         patient_clause = ' and p.int_Patient_Id = '+ PatientId 
@@ -172,6 +196,42 @@ def get_all_doctorshift():
 @app.route("/doctorlist")
 def load_doctor_list():
     return render_template("doctorShiftAssign.html")
+
+@app.route('/loaddoctordetails', methods=["POST","GET"])                          
+def get_doctor_detail():
+    doc_details = []
+    logged_doctor_Id = ''
+    DoctorId  = request.form.get('DoctorId')
+    ShiftDt   = request.form.get('ShiftDt') 
+    
+    DocId = "select int_Doctor_Id from tbl_doctor where int_User_Id = " + DoctorId
+    mycursor.execute(DocId)
+    myresult = mycursor.fetchone()
+    for i in myresult:
+        logged_doctor_Id = str(i)
+        
+    main_query = "select d.txt_Doctor_Name, s.txt_Shift_Type, sd.Shift_Date, p.txt_Patient_Name, \
+                  case when sd.attended_Flag = '2' then 'No' when sd.attended_Flag = '1' then 'Yes' end as AttendedFlag \
+                     from tbl_shiftpatientfordoctor sd, tbl_doctor d, tbl_patient p, tbl_shift s \
+                     where d.int_Doctor_Id = sd.Doctor_Id and p.int_Patient_Id = sd.Patient_Id and sd.Shift_Id = s.int_Shift_Id"
+           
+    doctor_clause = ''
+    date_clause = ''
+             
+    if(logged_doctor_Id != '0' and logged_doctor_Id != ''):
+        doctor_clause = ' and d.int_Doctor_Id = '+ logged_doctor_Id 
+    
+    if(ShiftDt != '--' and ShiftDt != ''):
+        date_clause = ' and sd.Shift_Date = "'+ ShiftDt + '"'
+        
+    final_query = main_query + doctor_clause + date_clause 
+    print(final_query)
+    mycursor.execute(final_query)
+    myresult = mycursor.fetchall()
+    for i in myresult:
+        doc_details.append(i)
+       
+    return doc_details
 
 @app.route("/getnurselist")
 def get_nurse_shift_list():  
@@ -204,7 +264,7 @@ def get_all_nurse_shift():
     ShiftId = request.form.get('ShiftId')
     ShiftDt = request.form.get('ShiftDt') #CAST(sn.Shift_Date AS date) as Sdate
     
-    main_query = "select n.txt_Nurse_Name, s.txt_Shift_Type, sn.Shift_Date AS date \
+    main_query = "select n.txt_Nurse_Name, s.txt_Shift_Type, sn.Shift_Date AS sdate \
                         from tbl_shiftfornurse sn, tbl_nurse n, tbl_shift s \
                         where n.int_Nurse_Id = sn.Nurse_Id and sn.Shift_Id = s.int_Shift_Id"       
     nurse_clause = ''
@@ -217,8 +277,8 @@ def get_all_nurse_shift():
     if(ShiftId != '0' and ShiftId != ''):
         shift_clause = ' and s.int_Shift_Id = '+ ShiftId 
     
-    if(ShiftDt != '--'):
-        date_clause = ' and sn.Shift_Date = '+ ShiftDt
+    if(ShiftDt != '--' and ShiftDt != ''):
+        date_clause = ' and sn.Shift_Date = "'+ ShiftDt + '"'
         
     final_query = main_query + nurse_clause + shift_clause + date_clause
     
