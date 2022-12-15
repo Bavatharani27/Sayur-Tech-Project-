@@ -3,38 +3,108 @@
         <title>Doctor</title>
         <h1>RK Hospital</h1>
         <script src="https://code.jquery.com/jquery-3.6.1.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/themes/redmond/jquery-ui.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/free-jqgrid/4.15.5/css/ui.jqgrid.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/free-jqgrid/4.15.5/jquery.jqgrid.min.js"></script>
+
         <script>
             $(document).ready(function (){
                 $('#doctorName').hide();
                 $('#currentDate').hide();
                 $('#lbldoctorName').hide();
                 $('#lblcurrentDate').hide();
+                $('#lblPatient').hide();
+                $('#patientid').hide();
+                $('#lblFlag').hide();
+                $('#attendflag').hide();
+                $('#lblDuration').hide();
+                $('#numduration').hide();
+
                 $('#btnSearch').hide();
                 $('#btnClear').hide(); 
+                $('#btnClose').hide(); 
+
 
                 $('#shiftdetails').click(function(){
                     $('#lbldoctorName').show();
                     $('#doctorName').show();
                     $('#doctorName').val(localStorage.getItem("UserName"));
-                /*  $('#currentDate').show();
+                    $('#currentDate').show();
                     $('#lblcurrentDate').show();
                     $('#btnSearch').show();
-                    $('#btnClear').show();  */
+                    $('#btnClear').show(); 
+                    $('#btnClose').show(); 
                 });
+
+                $('#myactivity').click(function(){
+                    $('#lbldoctorName').show();
+                    $('#doctorName').show();
+                    $('#doctorName').val(localStorage.getItem("UserName"));
+                    $('#currentDate').show();
+                    $('#lblcurrentDate').show();
+                    $('#lblPatient').show();
+                    $('#patientid').show();
+                    $('#lblFlag').show();
+                    $('#attendflag').show();
+                    $('#lblDuration').show();
+                    $('#numduration').show();
+                    $("#patientid").val(function(e){
+                        var DoctorId = localStorage.getItem("UserId");
+                       // var doctor = {'DoctorId':DoctorId};
+                        $.ajax({
+                           // data: doctor,
+                            url: "/assignedpatientlist"+"/"+DoctorId,
+                            success: function(data){
+                                var patient_name = '<option value="0"> Select Patient';
+                                for (var i = 0; i < data.length; i++) {
+                                    patient_name += '<option value="' + data[i].id + '">' + data[i].name + "</option>";
+                                }
+                                $("#patientid").html(patient_name)
+                            },
+                        });
+                    });
+                  /*  $('#btnSearch').show();
+                    $('#btnClear').show(); 
+                    $('#btnClose').show(); */
+                });
+
+                $('#btnSearch').click(function(e){
+                    var DoctorId = localStorage.getItem("UserId");
+                    var ShiftDt = $('#currentDate').val(); 
+                    var doctor_shift = {'DoctorId':DoctorId, 'ShiftDt':ShiftDt};
+                    $('#tblDoctorDetails').jqGrid({
+                        url:'/loaddoctordetails',
+                        postData: doctor_shift,
+                        datatype: "json",
+                        mtype: 'POST',
+                        colModel:[{name:'Doctor Name'},
+                                {name: 'Shift Type'}, 
+                                {name: 'Shift Date', width: 350},
+                                {name: 'Patient Name'},
+                                {name: 'Attended Flag'}]
+                    });
+                });
+
+                $('#btnClear').click(function(e){
+                    $('#currentDate').val(''); 
+                    $('#tblDoctorDetails').GridUnload(""); 
+                });
+
+                $('#btnClose').click(function(e){
+                    $('#doctorName').hide();
+                    $('#currentDate').hide();
+                    $('#lbldoctorName').hide();
+                    $('#lblcurrentDate').hide();
+                    $('#btnSearch').hide();
+                    $('#btnClear').hide(); 
+                    $('#btnClose').hide(); 
+                    $('#tblDoctorDetails').GridUnload(""); 
+                });
+
             });
         </script>
-        <!--script>
-            function myFunction(){
-                $('#lbldoctorName').show();
-                
-                $('#doctorName').show();
-                $('#doctorName').val(localStorage.getItem(UserName););
-              /*  $('#currentDate').show();
-                $('#lblcurrentDate').show();
-                $('#btnSearch').show();
-                $('#btnClear').show();  */
-            }
-        </script!-->
+    
         <style>
             h1{
                 text-align: center;
@@ -81,6 +151,93 @@
                 color: white;
                 box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
               }
+              .button3 {
+                background-color: white; 
+                color: black; 
+                border: 2px solid #032666;
+              }
+              .button3:hover {
+                background-color: #032666;
+                color: white;
+                box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+              }
+              #lbldoctorName{
+                    position: absolute; left: 350px; top: 100px;
+              }
+              #doctorName{
+                position: absolute; left: 350px; top: 130px;
+              }
+              .text{
+                padding: 8px 30px;
+                color: #333333;
+                background-color: #eeeeee;
+                border: 1px solid #dddddd;
+                cursor: pointer;
+                border-radius: 5px;
+                width: 150px;
+              }
+            .text:focus,
+            .text:hover{
+                outline:none;
+                border: 1px solid #bbbbbb;
+            }
+            .text{
+                background: #ffffff;
+            }
+              #lblcurrentDate{
+                position: absolute; left: 550px; top: 100px;
+            }
+            #currentDate{
+                position: absolute; left: 550px; top: 130px;
+            }
+            #lblPatient{
+                position: absolute; left: 750px; top: 100px;
+            }
+            #patientid{
+                position: absolute; left: 750px; top: 130px;
+            }
+            #lblFlag{
+                position: absolute; left: 950px; top: 100px;
+            }
+            #attendflag{
+                position: absolute; left: 950px; top: 130px;
+            }
+            #lblDuration{
+                position: absolute; left: 350px; top: 190px;
+            }
+            #numduration{
+                position: absolute; left: 350px; top: 220px;
+                width: 100px;
+            }
+            .select{
+                padding: 8px 30px;
+                color: #333333;
+                background-color: #eeeeee;
+                border: 1px solid #dddddd;
+                cursor: pointer;
+                border-radius: 5px; 
+        
+            }
+            .select:focus,
+            .select:hover{
+                outline:none;
+                border: 1px solid #bbbbbb;
+            }
+            .select{
+                background: #ffffff;
+            }
+            #btnSearch{
+                position: absolute; left: 750px; top: 110px;
+            }
+            #btnClear{
+                position: absolute; left: 870px; top: 110px;
+            }
+            #btnClose{
+                position: absolute; left: 980px; top: 110px;
+            }
+            .grid{
+                position: absolute; left: 100px; top: 220px;
+            }
         </style>
     </head>
 
@@ -92,14 +249,32 @@
             </ul>
         </div>
         <div class="elements">
-            <label id="lbldoctorName"><b>Name</b></label><br><br>
-            <input type="text" id="doctorName">
+                <label id="lbldoctorName"><b>Name</b></label><br><br>
+                <input type="text" id="doctorName" class="text">
 
-            <label id="lblcurrentDate"><b>Date</b></label><br><br>
-            <input type="date" id="currentDate">
+                <label id="lblcurrentDate"><b>Date</b></label><br><br>
+                <input type="date" id="currentDate" class="text">
 
-            <button id="btnSearch" class="button1">Search</button>
-            <button id="btnClear" class="button2">Clear</button>
+                <label id="lblPatient"><b>Patient</b></label><br><br>
+                <select id="patientid" class="select"><option> --select-- </option></select>
+
+                <label id="lblFlag"><b>Attend Flag</b></label><br><br>
+                <select id="attendflag" class="select">
+                    <option value='0'> --select-- </option>
+                    <option value='1'> Yes </option>
+                    <option value='2'> No </option>
+                </select>
+
+                <label id="lblDuration"><b>Duration</b></label><br><br>
+                <input type="number" id="numduration" class="select">
+
+                <button id="btnSearch" class="button1">Search</button>
+                <button id="btnClear" class="button2">Clear</button>
+                <button id="btnClose" class="button3">Close</button>
+
+                <div class="grid">
+                    <table id='tblDoctorDetails'></table>
+                </div>
         </div>
     </body>
 </html>
