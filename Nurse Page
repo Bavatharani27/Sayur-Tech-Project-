@@ -1,0 +1,447 @@
+<html>
+    <head>
+        <title>Doctor</title>
+        <h1>RK Hospital</h1>
+        <script src="https://code.jquery.com/jquery-3.6.1.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/themes/redmond/jquery-ui.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/free-jqgrid/4.15.5/css/ui.jqgrid.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/free-jqgrid/4.15.5/jquery.jqgrid.min.js"></script>
+
+        <script>
+            $(document).ready(function (){
+                $('#nurseName').hide();
+                $('#currentDate').hide();
+                $('#lblnurseName').hide();
+                $('#lblcurrentDate').hide();
+                $('#lblPatient').hide();
+                $('#patientid').hide();
+                $('#lblFlag').hide();
+                $('#lblFlagYes').hide();
+                $('#lblFlagNo').hide();
+                $('#attendflagY').hide();
+                $('#attendflagN').hide();
+                $('#lblDuration').hide();
+                $('#numduration').hide();
+
+                $('#btnSearch').hide();
+                $('#btnClear').hide(); 
+                $('#btnClose').hide(); 
+
+                $('#btnActivitySave').hide();
+                $('#btnActivityClear').hide();
+                $('#btnActivityClose').hide();
+                $('#btnActivitySearch').hide();
+
+
+                $('#shiftdetails').click(function(){
+                    $('#lblnurseName').show();
+                    $('#nurseName').show();
+                    $('#nurseName').val(localStorage.getItem("UserName"));
+                    $('#currentDate').show();
+                    $('#lblcurrentDate').show();
+                    $('#btnSearch').show();
+                    $('#btnClear').show(); 
+                    $('#btnClose').show(); 
+                });
+
+                $('#myactivity').click(function(){
+                    $('#lblnurseName').show();
+                    $('#nurseName').show();
+                    $('#nurseName').val(localStorage.getItem("UserName"));
+                    $('#currentDate').show();
+                    $('#lblcurrentDate').show();
+                    $('#lblPatient').show();
+                    $('#patientid').show();
+                    $('#lblFlag').show();
+                    $('#lblFlagYes').show();
+                    $('#lblFlagNo').show();
+                    $('#attendflagY').show();
+                    $('#attendflagN').show();
+                    $('#lblDuration').show();
+                    $('#numduration').show();
+                    $("#patientid").val(function(){
+                        $.ajax({
+                            url: "/patientlist",
+                            success: function(data){
+                                var patient_name = '<option value="0"> Select Patient';
+                                for (var i = 0; i < data.length; i++) {
+                                    patient_name += '<option value="' + data[i].id + '">' + data[i].name + "</option>";
+                                }
+                                $("#patientid").html(patient_name)
+                            },
+                        });
+                    });
+                    $('#btnActivitySave').show();
+                    $('#btnActivityClear').show();
+                    $('#btnActivityClose').show();
+                    $('#btnActivitySearch').show(); 
+                });
+
+                $('#btnSearch').click(function(e){
+                    var NurseId = localStorage.getItem("UserId");
+                    var ShiftDt = $('#currentDate').val(); 
+                    var nurse_shift = {'NurseId':NurseId, 'ShiftDt':ShiftDt};
+                    $('#tblNurseDetails').jqGrid({
+                        url:'/loadnursedetails',
+                        postData: nurse_shift,
+                        datatype: "json",
+                        mtype: 'POST',
+                        colModel:[{name:'Nurse Name'},
+                                {name: 'Shift Type'}, 
+                                {name: 'Shift Date', width: 350}]
+                    });
+                });
+
+                $('#btnClear').click(function(e){
+                    $('#currentDate').val(''); 
+                    $('#tblNurseDetails').GridUnload(""); 
+                });
+
+                $('#btnClose').click(function(e){
+                    $('#nurseName').hide();
+                    $('#currentDate').hide();
+                    $('#lblnurseName').hide();
+                    $('#lblcurrentDate').hide();
+        
+                    $('#btnSearch').hide();
+                    $('#btnClear').hide(); 
+                    $('#btnClose').hide(); 
+                    $('#tblNurseDetails').GridUnload(""); 
+                });
+
+                $('#btnActivitySave').click(function(e){
+                    var NurseId = localStorage.getItem("UserId");
+                    var CurrentDt = $('#currentDate').val();
+                    CurrentDt = CurrentDt.substring(0,4) + '-'+ CurrentDt.substring(5,7) +'-'+ CurrentDt.substring(8,10);
+                    var PatientId = $('#patientid').val();
+                    var AttendFlag = ''; // $('#attendflag').val();
+                    if(attendflagY.checked == true)
+                        AttendFlag = attendflagY.value;
+                    else
+                        AttendFlag = attendflagN.value;
+                    var Duration = $('#numduration').val();
+
+                    var nurse_activity = {'NurseId':NurseId, 'CurrentDt':CurrentDt, 'PatientId': PatientId, 'AttendFlag': AttendFlag, 'Duration':Duration};
+                    var nurse_activity_url = "/nurseactivitysave";
+                    $.ajax({
+                        url: nurse_activity_url,
+                        data: nurse_activity,
+                        type: 'POST',
+                        success:function(r){
+                            alert("Added Successfully");
+                        },
+                        error:function(r){
+                            alert("Error Occured when adding Activity");
+                        }
+                    });
+                });
+
+                $('#btnActivityClear').click(function(e){
+                    $('#currentDate').val(''); 
+                    $('#tblNurseActivityDetails').GridUnload(""); 
+                    $('#patientid').val(''); 
+                    attendflagY.checked = false; 
+                    attendflagN.checked = false; 
+                    $('#numduration').val(''); 
+                });
+
+                $('#btnActivitySearch').click(function(e){
+                    var AttendFlag = '';
+                    var NurseId = localStorage.getItem("UserId");
+                    var CurrentDt = $('#currentDate').val();
+                    CurrentDt = CurrentDt.substring(0,4) + '-'+ CurrentDt.substring(5,7) +'-'+ CurrentDt.substring(8,10);
+                    var PatientId = $('#patientid').val();
+                    if(attendflagY.checked == true)
+                        AttendFlag = attendflagY.value;
+                    else
+                        AttendFlag = attendflagN.value;
+                 //   var AttendFlag = $('#attendflagY').val();
+                    var Duration = $('#numduration').val();
+                    var nurse_activity_details = {'NurseId':NurseId, 'CurrentDt':CurrentDt, 'PatientId':PatientId, 'AttendFlag':AttendFlag, 
+                    'Duration':Duration};
+                    $('#tblNurseActivityDetails').jqGrid({
+                        url:'/loadnurseactivitydetails',
+                        postData: nurse_activity_details,
+                        datatype: "json",
+                        mtype: 'POST',
+                        colModel:[{name:'Nurse Name'},
+                                {name: 'Activity Date', width: 350},
+                                {name: 'Patient Name'},
+                                {name: 'Attended Flag'}, 
+                                {name: 'Duration'}]
+                    });
+                });
+
+                $('#btnActivityClose').click(function(e){
+                    $('#nurseName').hide();
+                    $('#currentDate').hide();
+                    $('#lblnurseName').hide();
+                    $('#lblcurrentDate').hide();
+                    $('#lblPatient').hide();
+                    $('#patientid').hide();
+                    $('#lblFlag').hide();
+                    $('#lblFlagYes').hide();
+                    $('#lblFlagNo').hide();
+                    $('#attendflag').hide();
+                    $('#attendflagY').hide();
+                    $('#attendflagN').hide();
+                    $('#lblDuration').hide();
+                    $('#numduration').hide();
+                    $('#btnActivitySave').hide();
+                    $('#btnActivityClear').hide(); 
+                    $('#btnActivityClose').hide(); 
+                    $('#btnActivitySearch').hide();
+                    $('#tblNurseActivityDetails').GridUnload(""); 
+                });
+            });
+        </script>
+    
+        <style>
+            h1{
+                text-align: center;
+            }
+            body{
+                background-image:url("https://images.unsplash.com/photo-1611689102033-7f9e0a8eb851?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTJ8fG1lZGljYWwlMjBiYWNrZ3JvdW5kfGVufDB8fDB8fA%3D%3D&w=1000&q=80");
+                background-repeat: no-repeat;
+                background-size:1500px;
+                
+            }
+            .nursepage{
+                padding-left: 90px;
+                padding-top: 30px;
+                font-size: 20px;
+            }
+            button{
+                background-color: #032666; 
+                border: none;
+                color: white;
+                padding: 10px 15px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                margin: 4px 2px;
+                transition-duration: 0.4s;
+                cursor: pointer;
+            }
+            .button1 {
+                background-color: white; 
+                color: black; 
+                border: 2px solid #032666;
+              }
+              .button1:hover {
+                background-color: #032666;
+                color: white;
+                box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+              }
+              .button2 {
+                background-color: white; 
+                color: black; 
+                border: 2px solid #032666;
+              }
+              .button2:hover {
+                background-color: #032666;
+                color: white;
+                box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+              }
+              .button3 {
+                background-color: white; 
+                color: black; 
+                border: 2px solid #032666;
+              }
+              .button3:hover {
+                background-color: #032666;
+                color: white;
+                box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+              }
+              .button4 {
+                background-color: white; 
+                color: black; 
+                border: 2px solid #032666;
+              }
+              .button4:hover {
+                background-color: #032666;
+                color: white;
+                box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+              }
+              .button5 {
+                background-color: white; 
+                color: black; 
+                border: 2px solid #032666;
+              }
+              .button5:hover {
+                background-color: #032666;
+                color: white;
+                box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+              }
+              .button6 {
+                background-color: white; 
+                color: black; 
+                border: 2px solid #032666;
+              }
+              .button6:hover {
+                background-color: #032666;
+                color: white;
+                box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+              }
+              .button7 {
+                background-color: white; 
+                color: black; 
+                border: 2px solid #032666;
+              }
+              .button7:hover {
+                background-color: #032666;
+                color: white;
+                box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+              }
+              #lblnurseName{
+                    position: absolute; left: 350px; top: 100px;
+              }
+              #nurseName{
+                position: absolute; left: 350px; top: 130px;
+              }
+              .text{
+                padding: 8px 30px;
+                color: #333333;
+                background-color: #eeeeee;
+                border: 1px solid #dddddd;
+                cursor: pointer;
+                border-radius: 5px;
+                width: 150px;
+              }
+            .text:focus,
+            .text:hover{
+                outline:none;
+                border: 1px solid #bbbbbb;
+            }
+            .text{
+                background: #ffffff;
+            }
+              #lblcurrentDate{
+                position: absolute; left: 550px; top: 100px;
+            }
+            #currentDate{
+                position: absolute; left: 550px; top: 130px;
+            }
+            #lblPatient{
+                position: absolute; left: 750px; top: 100px;
+            }
+            #patientid{
+                position: absolute; left: 750px; top: 130px;
+            }
+            #lblFlag{
+                position: absolute; left: 950px; top: 100px;
+            }
+            #lblFlagYes{
+                position: absolute; left: 980px; top: 140px;
+            }
+            #lblFlagNo{
+                position: absolute; left: 1080px; top: 140px;
+            }
+            #attendflagY{
+                position: absolute; left: 950px; top: 140px;
+            }
+            #attendflagN{
+                position: absolute; left: 1050px; top: 140px;
+            }
+            #lblDuration{
+                position: absolute; left: 350px; top: 190px;
+            }
+            #numduration{
+                position: absolute; left: 350px; top: 220px;
+                width: 100px;
+            }
+            .select{
+                padding: 8px 30px;
+                color: #333333;
+                background-color: #eeeeee;
+                border: 1px solid #dddddd;
+                cursor: pointer;
+                border-radius: 5px; 
+        
+            }
+            .select:focus,
+            .select:hover{
+                outline:none;
+                border: 1px solid #bbbbbb;
+            }
+            .select{
+                background: #ffffff;
+            }
+            #btnSearch{
+                position: absolute; left: 750px; top: 110px;
+            }
+            #btnClear{
+                position: absolute; left: 870px; top: 110px;
+            }
+            #btnClose{
+                position: absolute; left: 980px; top: 110px;
+            }
+
+            #btnActivitySave{
+                position: absolute; left: 600px; top: 210px;
+            }
+            #btnActivityClear{
+                position: absolute; left: 730px; top: 210px;
+            }
+            #btnActivitySearch{
+                position: absolute; left: 860px; top: 210px;
+            }
+            #btnActivityClose{
+                position: absolute; left: 990px; top: 210px;
+            }
+            .grid{
+                position: absolute; left: 100px; top: 210px;
+            }
+            .ActivityGrid{
+                position: absolute; left: 100px; top: 300px;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="nursepage">
+            <ul>
+                <li><a href="#" id="shiftdetails" style="color:#9830B4;"><b>Shift Details</b></a></li><br>
+                <li><a href="#" id="myactivity" style="color:#9830B4;"><b>My Activity</b></a></li>
+            </ul>
+        </div>
+        <div class="elements">
+                <label id="lblnurseName"><b>Name</b></label><br><br>
+                <input type="text" id="nurseName" class="text">
+
+                <label id="lblcurrentDate"><b>Date</b></label><br><br>
+                <input type="date" id="currentDate" class="text">
+
+                <label id="lblPatient"><b>Patient</b></label><br><br>
+                <select id="patientid" class="select"><option> --select-- </option></select>
+
+                <label id="lblFlag"><b>Attend Flag</b></label><br><br>
+                <input type="radio" id="attendflagY" name="yes" value="1">
+                <label id="lblFlagYes"><b>Yes</b></label>
+                <input type="radio" id="attendflagN" name="yes" value="2">
+                <label id="lblFlagNo"><b>No</b></label>
+
+                <label id="lblDuration"><b>Duration</b></label><br><br>
+                <input type="number" id="numduration" class="select">
+
+                <button id="btnSearch" class="button1">Search</button>
+                <button id="btnClear" class="button2">Clear</button>
+                <button id="btnClose" class="button3">Close</button>
+
+                <button id="btnActivitySave" class="button4">Save</button>
+                <button id="btnActivityClear" class="button5">Clear</button>
+                <button id="btnActivityClose" class="button6">Close</button>
+                <button id="btnActivitySearch" class="button7">Search</button>
+
+                <div class="grid">
+                    <table id='tblNurseDetails'></table>
+                </div>
+
+                <div class="ActivityGrid">
+                    <table id='tblNurseActivityDetails'></table>
+                </div>
+        </div>
+    </body>
+</html>
