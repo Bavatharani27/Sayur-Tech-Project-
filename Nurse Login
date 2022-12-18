@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://code.jquery.com/jquery-3.6.1.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#btnNurseLogin').click(function(e){
+          var username = $('#txtUserName').val();
+          var password = $('#txtPassword').val();
+
+          var loginUser = {'username':username, 'password':password};
+          var login_url = "/userlogin";
+          $.ajax({
+              url: login_url,
+              data:loginUser, 
+              datatype: "json",
+              type: 'POST',
+              success:function(r){
+                localStorage.setItem("UserId", r[0][0]);
+                localStorage.setItem("UserName", r[0][1]);
+                for(var index in r){
+                  if(r[index][1] == username && r[index][2] == password){
+                      location.href = ('/nursepage');
+                  }
+                }
+              },
+              error:function(r){
+                  alert("error");
+              }
+          });
+        });
+     });
+</script>
+<style>
+    body {font-family: Arial, Helvetica, sans-serif;
+        background-color:#000080;}
+
+    input[type=text], input[type=password] {
+      width: 100%;
+      padding: 12px 20px;
+      length:50%;
+      margin: 8px 0;
+      display: inline-block;
+      box-sizing: border-box;
+    }
+
+    button {
+      background-color: #92B7F1;
+      color: black;
+      padding: 14px 20px;
+      margin: 8px 0;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    button:hover {
+      opacity: 0.8;
+    }
+    .imgcontainer {
+      text-align: center;
+      margin: 55px 0 12px 0;
+    }
+
+    img.avatar {
+      width: 10%;
+      border-radius: 50%;
+    }
+    .container {
+      padding: 10px 16px 0 450px;
+      width:500px;
+    }
+    .cancontainer {
+        padding: 0 16px 0 710px;
+        width:100px;
+    }
+    .cancelbtn {
+        padding: 14px 10px;
+        width:100px;
+        position:relative;
+        left:210px;
+        background-color: #92B7F1;
+        color:black;
+      }
+    span.psw {
+      float: right;
+      padding-top: 16px;
+      position:relative;
+      left:100px;
+      width:150px;
+      color:white;
+    }
+</style>
+</head>
+<body> 
+  <div class="imgcontainer">
+    <img src='https://i.postimg.cc/HLrWDRjF/c.png' border='0' class="avatar" alt='Avatar'/>
+  </div>
+
+  <div class="container">
+    <label for="uname" style="color:white;"><b>Username</b></label>
+    <input type="text" id="txtUserName" placeholder="Enter Username" name="uname" required style="width:420px;">
+
+    <label for="psw" style="color:white;"><b>Password</b></label>
+    <input type="password" id="txtPassword" placeholder="Enter Password" name="psw" required style="width:420px;">
+        
+    <button class="loginbtn" id="btnNurseLogin" style="width:100px;">Login</button>
+    <button class="cancelbtn">Cancel</button>
+  </div>
+
+  <div class="cancontainer" style="background-color:#000080">
+    <span class="psw"><b>Forgot</b> <a href="#" style="color: pink;">password?</a></span>
+  </div>
+</body>
+</html>
