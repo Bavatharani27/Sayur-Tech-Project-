@@ -12,6 +12,7 @@
             }
             body{
                 background-color:#e6e6ff;
+                background-image:url(https://img.freepik.com/free-vector/clean-medical-background-vector_53876-140865.jpg?w=2000);
             }
             #doctorId{
                 width:170px;
@@ -30,34 +31,69 @@
                 position:absolute; left:825px;
                 top:110px;
             }
-            #attendflag{
+            #lblFlag{
+                position:absolute; left:1050px; top:80px;
+            }
+            #lblFlagYes{
+                position:absolute; left:1080px; top:120px;
+            }
+            #lblFlagNo{
+                position:absolute; left:1170px; top:120px;
+            }
+            #attendflagY{
                 position:absolute; left:1050px;
-                top:110px;
+                top:120px;
+            }
+            #attendflagN{
+                position:absolute; left:1140px;
+                top:120px;
+            }
+            button{
+                background-color: #032666; 
+                border: none;
+                color: white;
+                padding: 10px 15px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                margin: 4px 2px;
+                transition-duration: 0.4s;
+                cursor: pointer;
             }
             .save {
-                background-color:#92B7F1;
-                width: 55px;
-                height: 29px;
-                border: 1px solid #909090;
-                border-radius: 10%;
+                background-color: white; 
+                color: black; 
+                border: 2px solid #032666;
                 position:absolute; left:1080px; top:190px;
-            }
-            .clear {
-                background-color:#92B7F1;
-                width: 55px;
-                height: 29px;
-                border: 1px solid #909090;
-                border-radius: 10%;
-                position:absolute; left:1165px; top:190px;
-            }
+              }
+              .save:hover {
+                background-color: #032666;
+                color: white;
+                box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+              }
             .search {
-                background-color:#92B7F1;
-                width: 55px;
-                height: 29px;
-                border: 1px solid #909090;
-                border-radius: 10%;
+                background-color: white; 
+                color: black; 
+                border: 2px solid #032666;
                 position:absolute; left:1250px; top:190px;
-            }
+              }
+              .search:hover {
+                background-color: #032666;
+                color: white;
+                box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+              }
+              .clear {
+                background-color: white; 
+                color: black; 
+                border: 2px solid #032666;
+                position:absolute; left:1165px; top:190px;
+              }
+              .clear:hover {
+                background-color: #032666;
+                color: white;
+                box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+              }
             .grid {
                 position:absolute; left:110px; top:210px;
             }
@@ -146,8 +182,11 @@
                          var ShiftDt = $('#date').val();
                          ShiftDt = ShiftDt.substring(0,4) + '-'+ ShiftDt.substring(5,7) +'-'+ ShiftDt.substring(8,10);
                          var PatientId = $('#patientid').val();
-                         var AttendFlag = $('#attendflag').val();
-     
+                         var AttendFlag = ''; //$('#attendflag').val();
+                         if(attendflagY.checked == true)
+                            AttendFlag = attendflagY.value;
+                         else
+                            AttendFlag = attendflagN.value;
                          var doctor_shift = {'DocId':DocId, 'ShiftId':ShiftId, 'ShiftDt':ShiftDt,'PatientId': PatientId, 'AttendFlag': AttendFlag};
                          var doctor_shift_url = "http://127.0.0.1:5000/assignShiftfordoctor";
                          $.ajax({
@@ -168,7 +207,11 @@
                         var ShiftId = $('#shiftid').val();
                         var ShiftDt = $('#date').val(); 
                         var PatientId = $('#patientid').val(); 
-                        var AttendFlag = $('#attendflag').val(); 
+                        var AttendFlag = ''; //$('#attendflag').val(); 
+                        if(attendflagY.checked == true)
+                            AttendFlag = attendflagY.value;
+                        else
+                            AttendFlag = attendflagN.value;
 
                         var doctor_shift = {'DoctorId':DoctorId, 'ShiftId':ShiftId, 'ShiftDt':ShiftDt, 'PatientId':PatientId, 'AttendFlag': AttendFlag};
                         $('#tblDoctorShift').jqGrid({
@@ -188,7 +231,8 @@
                         $('#shiftid').val("");
                         $('#date').val(""); 
                         $('#patientid').val(""); 
-                        $('#attendflag').val(""); 
+                        attendflagY.checked = false; 
+                        attendflagN.checked = false; 
                         $('#tblDoctorShift').GridUnload(""); 
                     });
                 });
@@ -210,13 +254,12 @@
                     <label style="position:absolute; left:825px; top:80px;">Patient</label><br><br>
                     <select name="patient" id="patientid" class="select"><option> --select-- </option></select>
 
-                    <label style="position:absolute; left:1050px; top:80px;">Attend Flag</label><br><br>
-                    <select name="patient" id="attendflag" class="select">
-                        <option value='0'> --select-- </option>
-                        <option value='1'> Yes </option>
-                        <option value='2'> No </option>
-                    </select>
-                
+                    <label id="lblFlag"><b>Attend Flag</b></label><br><br>
+                    <input type="radio" id="attendflagY" name="yes" value="1">
+                    <label id="lblFlagYes"><b>Yes</b></label>
+                    <input type="radio" id="attendflagN" name="yes" value="2">
+                    <label id="lblFlagNo"><b>No</b></label>
+
                     <button class="save" id="btnSave"><b>Save</b></button>
                     <button class="clear" id="btnClear"><b>Clear</b></button>
                     <button class="search" id="btnSearch"><b>Search</b></button>
