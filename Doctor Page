@@ -17,13 +17,21 @@
                 $('#lblPatient').hide();
                 $('#patientid').hide();
                 $('#lblFlag').hide();
-                $('#attendflag').hide();
+                $('#lblFlagYes').hide();
+                $('#lblFlagNo').hide();
+                $('#attendflagY').hide();
+                $('#attendflagN').hide();
                 $('#lblDuration').hide();
                 $('#numduration').hide();
 
                 $('#btnSearch').hide();
                 $('#btnClear').hide(); 
                 $('#btnClose').hide(); 
+
+                $('#btnActivitySave').hide();
+                $('#btnActivityClear').hide();
+                $('#btnActivityClose').hide();
+                $('#btnActivitySearch').hide();
 
 
                 $('#shiftdetails').click(function(){
@@ -46,14 +54,15 @@
                     $('#lblPatient').show();
                     $('#patientid').show();
                     $('#lblFlag').show();
-                    $('#attendflag').show();
+                    $('#lblFlagYes').show();
+                    $('#lblFlagNo').show();
+                    $('#attendflagY').show();
+                    $('#attendflagN').show();
                     $('#lblDuration').show();
                     $('#numduration').show();
                     $("#patientid").val(function(e){
                         var DoctorId = localStorage.getItem("UserId");
-                       // var doctor = {'DoctorId':DoctorId};
                         $.ajax({
-                           // data: doctor,
                             url: "/assignedpatientlist"+"/"+DoctorId,
                             success: function(data){
                                 var patient_name = '<option value="0"> Select Patient';
@@ -64,9 +73,10 @@
                             },
                         });
                     });
-                  /*  $('#btnSearch').show();
-                    $('#btnClear').show(); 
-                    $('#btnClose').show(); */
+                    $('#btnActivitySave').show();
+                    $('#btnActivityClear').show();
+                    $('#btnActivityClose').show();
+                    $('#btnActivitySearch').show(); 
                 });
 
                 $('#btnSearch').click(function(e){
@@ -96,12 +106,93 @@
                     $('#currentDate').hide();
                     $('#lbldoctorName').hide();
                     $('#lblcurrentDate').hide();
+        
                     $('#btnSearch').hide();
                     $('#btnClear').hide(); 
                     $('#btnClose').hide(); 
                     $('#tblDoctorDetails').GridUnload(""); 
                 });
 
+                $('#btnActivitySave').click(function(e){
+                    var DocId = localStorage.getItem("UserId");
+                    var CurrentDt = $('#currentDate').val();
+                    CurrentDt = CurrentDt.substring(0,4) + '-'+ CurrentDt.substring(5,7) +'-'+ CurrentDt.substring(8,10);
+                    var PatientId = $('#patientid').val();
+                    var AttendFlag = ''; // $('#attendflag').val();
+                    if(attendflagY.checked == true)
+                        AttendFlag = attendflagY.value;
+                    else
+                        AttendFlag = attendflagN.value;
+                    var Duration = $('#numduration').val();
+
+                    var doctor_activity = {'DocId':DocId, 'CurrentDt':CurrentDt, 'PatientId': PatientId, 'AttendFlag': AttendFlag, 'Duration':Duration};
+                    var doctor_activity_url = "/doctoractivitysave";
+                    $.ajax({
+                        url: doctor_activity_url,
+                        data: doctor_activity,
+                        type: 'POST',
+                        success:function(r){
+                            alert("Added Successfully");
+                        },
+                        error:function(r){
+                            alert("Error Occured when adding Activity");
+                        }
+                    });
+                });
+
+                $('#btnActivityClear').click(function(e){
+                    $('#currentDate').val(''); 
+                    $('#tblDoctorActivityDetails').GridUnload(""); 
+                    $('#patientid').val(''); 
+                    attendflagY.checked = false; 
+                    attendflagN.checked = false; 
+                    $('#numduration').val(''); 
+                });
+
+                $('#btnActivitySearch').click(function(e){
+                    var AttendFlag = '';
+                    var DoctorId = localStorage.getItem("UserId");
+                    var CurrentDt = $('#currentDate').val();
+                    CurrentDt = CurrentDt.substring(0,4) + '-'+ CurrentDt.substring(5,7) +'-'+ CurrentDt.substring(8,10);
+                    var PatientId = $('#patientid').val();
+                    if(attendflagY.checked == true)
+                        AttendFlag = attendflagY.value;
+                    else
+                        AttendFlag = attendflagN.value;
+                 //   var AttendFlag = $('#attendflagY').val();
+                    var Duration = $('#numduration').val();
+                    var doctor_activity_details = {'DoctorId':DoctorId, 'CurrentDt':CurrentDt, 'PatientId':PatientId, 'AttendFlag':AttendFlag, 
+                    'Duration':Duration};
+                    $('#tblDoctorActivityDetails').jqGrid({
+                        url:'/loaddoctoractivitydetails',
+                        postData: doctor_activity_details,
+                        datatype: "json",
+                        mtype: 'POST',
+                        colModel:[{name:'Doctor Name'},
+                                {name: 'Activity Date', width: 350},
+                                {name: 'Patient Name'},
+                                {name: 'Attended Flag'}, 
+                                {name: 'Duration'}]
+                    });
+                });
+
+                $('#btnActivityClose').click(function(e){
+                    $('#doctorName').hide();
+                    $('#currentDate').hide();
+                    $('#lbldoctorName').hide();
+                    $('#lblcurrentDate').hide();
+                    $('#lblPatient').hide();
+                    $('#patientid').hide();
+                    $('#lblFlag').hide();
+                    $('#attendflag').hide();
+                    $('#lblDuration').hide();
+                    $('#numduration').hide();
+                    $('#btnActivitySave').hide();
+                    $('#btnActivityClear').hide(); 
+                    $('#btnActivityClose').hide(); 
+                    $('#btnActivitySearch').hide();
+                    $('#tblDoctorActivityDetails').GridUnload(""); 
+                });
             });
         </script>
     
@@ -161,6 +252,46 @@
                 color: white;
                 box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
               }
+              .button4 {
+                background-color: white; 
+                color: black; 
+                border: 2px solid #032666;
+              }
+              .button4:hover {
+                background-color: #032666;
+                color: white;
+                box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+              }
+              .button5 {
+                background-color: white; 
+                color: black; 
+                border: 2px solid #032666;
+              }
+              .button5:hover {
+                background-color: #032666;
+                color: white;
+                box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+              }
+              .button6 {
+                background-color: white; 
+                color: black; 
+                border: 2px solid #032666;
+              }
+              .button6:hover {
+                background-color: #032666;
+                color: white;
+                box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+              }
+              .button7 {
+                background-color: white; 
+                color: black; 
+                border: 2px solid #032666;
+              }
+              .button7:hover {
+                background-color: #032666;
+                color: white;
+                box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+              }
               #lbldoctorName{
                     position: absolute; left: 350px; top: 100px;
               }
@@ -199,8 +330,17 @@
             #lblFlag{
                 position: absolute; left: 950px; top: 100px;
             }
-            #attendflag{
-                position: absolute; left: 950px; top: 130px;
+            #lblFlagYes{
+                position: absolute; left: 980px; top: 140px;
+            }
+            #lblFlagNo{
+                position: absolute; left: 1080px; top: 140px;
+            }
+            #attendflagY{
+                position: absolute; left: 950px; top: 140px;
+            }
+            #attendflagN{
+                position: absolute; left: 1050px; top: 140px;
             }
             #lblDuration{
                 position: absolute; left: 350px; top: 190px;
@@ -235,8 +375,24 @@
             #btnClose{
                 position: absolute; left: 980px; top: 110px;
             }
+
+            #btnActivitySave{
+                position: absolute; left: 600px; top: 210px;
+            }
+            #btnActivityClear{
+                position: absolute; left: 730px; top: 210px;
+            }
+            #btnActivitySearch{
+                position: absolute; left: 860px; top: 210px;
+            }
+            #btnActivityClose{
+                position: absolute; left: 990px; top: 210px;
+            }
             .grid{
-                position: absolute; left: 100px; top: 220px;
+                position: absolute; left: 100px; top: 210px;
+            }
+            .ActivityGrid{
+                position: absolute; left: 100px; top: 300px;
             }
         </style>
     </head>
@@ -259,11 +415,10 @@
                 <select id="patientid" class="select"><option> --select-- </option></select>
 
                 <label id="lblFlag"><b>Attend Flag</b></label><br><br>
-                <select id="attendflag" class="select">
-                    <option value='0'> --select-- </option>
-                    <option value='1'> Yes </option>
-                    <option value='2'> No </option>
-                </select>
+                <input type="radio" id="attendflagY" name="yes" value="1">
+                <label id="lblFlagYes"><b>Yes</b></label>
+                <input type="radio" id="attendflagN" name="yes" value="2">
+                <label id="lblFlagNo"><b>No</b></label>
 
                 <label id="lblDuration"><b>Duration</b></label><br><br>
                 <input type="number" id="numduration" class="select">
@@ -272,8 +427,17 @@
                 <button id="btnClear" class="button2">Clear</button>
                 <button id="btnClose" class="button3">Close</button>
 
+                <button id="btnActivitySave" class="button4">Save</button>
+                <button id="btnActivityClear" class="button5">Clear</button>
+                <button id="btnActivityClose" class="button6">Close</button>
+                <button id="btnActivitySearch" class="button7">Search</button>
+
                 <div class="grid">
                     <table id='tblDoctorDetails'></table>
+                </div>
+
+                <div class="ActivityGrid">
+                    <table id='tblDoctorActivityDetails'></table>
                 </div>
         </div>
     </body>
