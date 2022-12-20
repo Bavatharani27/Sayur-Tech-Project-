@@ -123,7 +123,7 @@ def get_assigned_patient_list(DoctorId):
     patients = [] 
     logged_doctor_Id = ''
     
-    DocId = "select int_Doctor_Id from tbl_doctor where int_User_Id = " + str(DoctorId)
+    DocId = "select distinct int_Doctor_Id from tbl_doctor where int_User_Id = " + str(DoctorId)
     mycursor.execute(DocId)
     myresult = mycursor.fetchone()
     for i in myresult:
@@ -164,10 +164,23 @@ def create_new_activity_for_doctor():
     mycursor.executemany(stmt, doctor_activity)
     
     updatestmt = "update tbl_shiftpatientfordoctor set tbl_shiftpatientfordoctor.attended_Flag = " + AttendFlag + "\
-        where tbl_shiftpatientfordoctor.Patient_Id = " + PatientId
+         where " 
+         
+    patient_clause = ''
+    date_clause = ''
         
-    print(updatestmt)
-    mycursor.execute(updatestmt)
+    if(PatientId != '' and PatientId != '0'):
+        patient_clause = "tbl_shiftpatientfordoctor.Patient_Id = " + PatientId
+        
+    if(CurrentDt != '--' and CurrentDt != ''):
+        date_clause = " and tbl_shiftpatientfordoctor.Shift_Date = '" + CurrentDt + "'"
+       
+    final_query = updatestmt + patient_clause + date_clause
+    
+    print(final_query)
+    mycursor.execute(final_query)
+    # print(updatestmt)
+    # mycursor.execute(updatestmt)
     
     mydb.commit()
     return ''
@@ -288,7 +301,7 @@ def get_doctor_activity_detail():
         logged_doctor_Id = str(i)
         
     main_query = "select d.txt_Doctor_Name, da.Activity_Date, p.txt_Patient_Name, \
-                  case when da.Attend_Flag = '2' then 'No' when da.Attend_Flag = '1' then 'Yes' end as AttendedFlag \
+                  case when da.Attend_Flag = '2' then 'No' when da.Attend_Flag = '1' then 'Yes' end as AttendedFlag, da.Duration \
                      from tbl_doctoractivity da, tbl_doctor d, tbl_patient p \
                      where d.int_Doctor_Id = da.Doctor_Id and p.int_Patient_Id = da.Patient_Id"
            
@@ -442,6 +455,110 @@ def get_nurse_activity_detail():
        
     return nurse_activity_details
 
+@app.route('/loadnursedetailsummary', methods=["POST","GET"])                 #load nurse activity details summary        
+def get_nurse_activity_detail_summary():
+    nurse_activity_details_summary = []
+    DoctorId  = request.form.get('DoctorId')
+    NurseId  = request.form.get('NurseId')
+    FromDt   = request.form.get('FromDt') 
+    ToDt   = request.form.get('ToDt') 
+    ReportType = request.form.get('ReportType')
+    
+    doctor_clause = ''
+    nurse_clause = ''
+    fdate_clause = ''
+    #tdate_clause = ''
+        
+    if(ReportType == '1'):
+        main_query1 = "select d.txt_Doctor_Name, da.Activity_Date, p.txt_Patient_Name, \
+                    case when da.Attend_Flag = '2' then 'No' when da.Attend_Flag = '1' then 'Yes' end as AttendedFlag, da.Duration \
+                        from tbl_doctoractivity da, tbl_doctor d, tbl_patient p \
+                        where d.int_Doctor_Id = da.Doctor_Id and p.int_Patient_Id = da.Patient_Id"
+                
+        if(DoctorId != '0' and DoctorId != ''):
+            doctor_clause = ' and d.int_Doctor_Id = '+ DoctorId 
+        
+        if(FromDt != '--' and FromDt != ''):
+            fdate_clause = ' and da.Activity_Date between "'+ FromDt + '" and "' + ToDt + '"'
+            
+        # if(ToDt != '0' and ToDt != ''):
+        #     tdate_clause = ' and p.int_Patient_Id = '+ ToDt 
+            
+        final_query1 = main_query1 + doctor_clause + fdate_clause #+ tdate_clause 
+        print(final_query1)
+        mycursor.execute(final_query1)
+        myresult = mycursor.fetchall()
+        for i in myresult:
+            nurse_activity_details_summary.append(i)
+    
+    elif(ReportType == '2'):
+        main_query2 = "select n.txt_Nurse_Name, na.Activity_Date, p.txt_Patient_Name, \
+                    case when na.Attend_Flag = '2' then 'No' when na.Attend_Flag = '1' then 'Yes' end as AttendedFlag, na.Duration \
+                        from tbl_nurseactivity na, tbl_nurse n, tbl_patient p \
+                        where n.int_Nurse_Id = na.Nurse_Id and p.int_Patient_Id = na.Patient_Id"
+                
+        if(NurseId != '0' and NurseId != ''):
+            nurse_clause = ' and n.int_Nurse_Id = '+ NurseId 
+        
+        if(FromDt != '--' and FromDt != ''):
+            fdate_clause = ' and na.Activity_Date between "'+ FromDt + '" and "' + ToDt + '"'
+            
+        # if(ToDt != '0' and ToDt != ''):
+        #     tdate_clause = ' and p.int_Patient_Id = '+ ToDt 
+            
+        final_query2 = main_query2 + nurse_clause + fdate_clause #+ tdate_clause 
+        print(final_query2)
+        mycursor.execute(final_query2)
+        myresult = mycursor.fetchall()
+        for i in myresult:
+            nurse_activity_details_summary.append(i)
+       
+    elif(ReportType == '3'):
+        main_query3 = "select d.txt_Doctor_Name, da.Activity_Date, p.txt_Patient_Name, \
+                    case when da.Attend_Flag = '2' then 'No' when da.Attend_Flag = '1' then 'Yes' end as AttendedFlag, da.Duration \
+                        from tbl_doctoractivity da, tbl_doctor d, tbl_patient p \
+                        where d.int_Doctor_Id = da.Doctor_Id and p.int_Patient_Id = da.Patient_Id"
+                
+        if(DoctorId != '0' and DoctorId != ''):
+            doctor_clause = ' and d.int_Doctor_Id = '+ DoctorId 
+        
+        if(FromDt != '--' and FromDt != ''):
+            fdate_clause = ' and na.Activity_Date between "'+ FromDt + '" and "' + ToDt + '"'
+            
+        # if(ToDt != '0' and ToDt != ''):
+        #     tdate_clause = ' and p.int_Patient_Id = '+ ToDt 
+            
+        final_query3 = main_query3 + nurse_clause + fdate_clause #+ tdate_clause 
+        print(final_query3)
+        mycursor.execute(final_query3)
+        myresult = mycursor.fetchall()
+        for i in myresult:
+            nurse_activity_details_summary.append(i)
+       
+    elif(ReportType == '4'):
+        main_query4 = "select d.txt_Doctor_Name, da.Activity_Date, p.txt_Patient_Name, \
+                    case when da.Attend_Flag = '2' then 'No' when da.Attend_Flag = '1' then 'Yes' end as AttendedFlag, da.Duration \
+                        from tbl_doctoractivity da, tbl_doctor d, tbl_patient p \
+                        where d.int_Doctor_Id = da.Doctor_Id and p.int_Patient_Id = da.Patient_Id"
+                
+        if(DoctorId != '0' and DoctorId != ''):
+            doctor_clause = ' and d.int_Doctor_Id = '+ DoctorId 
+        
+        if(FromDt != '--' and FromDt != ''):
+            fdate_clause = ' and na.Activity_Date between "'+ FromDt + '" and "' + ToDt + '"'
+            
+        # if(ToDt != '0' and ToDt != ''):
+        #     tdate_clause = ' and p.int_Patient_Id = '+ ToDt 
+            
+        final_query4 = main_query4 + nurse_clause + fdate_clause #+ tdate_clause 
+        print(final_query4)
+        mycursor.execute(final_query4)
+        myresult = mycursor.fetchall()
+        for i in myresult:
+            nurse_activity_details_summary.append(i)
+        
+    return nurse_activity_details_summary
+    
 @app.route('/assignShiftfornurse', methods=["POST"])     
 def create_new_shift_for_nurse():
     global nurse_shift
