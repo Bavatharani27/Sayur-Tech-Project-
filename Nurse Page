@@ -21,6 +21,8 @@
                 $('#lblFlagNo').hide();
                 $('#attendflagY').hide();
                 $('#attendflagN').hide();
+                $('#lblShift').hide();
+                $('#shiftid').hide();
                 $('#lblDuration').hide();
                 $('#numduration').hide();
 
@@ -58,6 +60,8 @@
                     $('#lblFlagNo').show();
                     $('#attendflagY').show();
                     $('#attendflagN').show();
+                    $('#lblShift').show();
+                    $('#shiftid').show();
                     $('#lblDuration').show();
                     $('#numduration').show();
                     $("#patientid").val(function(){
@@ -76,6 +80,19 @@
                     $('#btnActivityClear').show();
                     $('#btnActivityClose').show();
                     $('#btnActivitySearch').show(); 
+                });
+
+                $("#shiftid").val(function(){
+                    $.ajax({
+                        url: "/shift",
+                        success: function(data){
+                            var shift_name = ''; //<option value="0"> Select Shift
+                            for (var i = 0; i < data.length; i++) {
+                                shift_name += '<option value="' + data[i].id + '">' + data[i].name + "</option>";
+                            }
+                            $("#shiftid").html(shift_name)
+                        },
+                    });
                 });
 
                 $('#btnSearch').click(function(e){
@@ -121,8 +138,9 @@
                     else
                         AttendFlag = attendflagN.value;
                     var Duration = $('#numduration').val();
+                    var ShiftId = $('#shiftid').val();
 
-                    var nurse_activity = {'NurseId':NurseId, 'CurrentDt':CurrentDt, 'PatientId': PatientId, 'AttendFlag': AttendFlag, 'Duration':Duration};
+                    var nurse_activity = {'NurseId':NurseId, 'CurrentDt':CurrentDt, 'PatientId': PatientId, 'AttendFlag': AttendFlag, 'Duration':Duration, 'ShiftId':ShiftId};
                     var nurse_activity_url = "/nurseactivitysave";
                     $.ajax({
                         url: nurse_activity_url,
@@ -144,6 +162,7 @@
                     attendflagY.checked = false; 
                     attendflagN.checked = false; 
                     $('#numduration').val(''); 
+                    $('#shiftid').val(''); 
                 });
 
                 $('#btnActivitySearch').click(function(e){
@@ -158,14 +177,16 @@
                         AttendFlag = attendflagN.value;
                  //   var AttendFlag = $('#attendflagY').val();
                     var Duration = $('#numduration').val();
+                    var ShiftId = $('#shiftid').val();
+
                     var nurse_activity_details = {'NurseId':NurseId, 'CurrentDt':CurrentDt, 'PatientId':PatientId, 'AttendFlag':AttendFlag, 
-                    'Duration':Duration};
+                    'Duration':Duration, 'ShiftId': ShiftId};
                     $('#tblNurseActivityDetails').jqGrid({
                         url:'/loadnurseactivitydetails',
                         postData: nurse_activity_details,
                         datatype: "json",
                         mtype: 'POST',
-                        colModel:[{name:'Nurse Name'},
+                        colModel:[{name:'Nurse Name'}, {name:'Shift Type'},
                                 {name: 'Activity Date', width: 350},
                                 {name: 'Patient Name'},
                                 {name: 'Attended Flag'}, 
@@ -186,6 +207,8 @@
                     $('#attendflag').hide();
                     $('#attendflagY').hide();
                     $('#attendflagN').hide();
+                    $('#lblShift').hide();
+                    $('#shiftid').hide();
                     $('#lblDuration').hide();
                     $('#numduration').hide();
                     $('#btnActivitySave').hide();
@@ -318,6 +341,23 @@
             .text{
                 background: #ffffff;
             }
+            .date{
+                padding: 8px 30px;
+                color: #333333;
+                background-color: #eeeeee;
+                border: 1px solid #dddddd;
+                cursor: pointer;
+                border-radius: 5px;
+                width: 150px;
+              }
+            .date:focus,
+            .date:hover{
+                outline:none;
+                border: 1px solid #bbbbbb;
+            }
+            .date{
+                background: #ffffff;
+            }
               #lblcurrentDate{
                 position: absolute; left: 550px; top: 100px;
             }
@@ -345,11 +385,17 @@
             #attendflagN{
                 position: absolute; left: 1050px; top: 140px;
             }
-            #lblDuration{
+            #lblShift{
                 position: absolute; left: 350px; top: 190px;
             }
+            #shiftid{
+                position: absolute; left: 350px; top: 220px;  
+            }
+            #lblDuration{
+                position: absolute; left: 550px; top: 190px;
+            }
             #numduration{
-                position: absolute; left: 350px; top: 220px;
+                position: absolute; left: 550px; top: 220px;
                 width: 100px;
             }
             .select{
@@ -359,7 +405,6 @@
                 border: 1px solid #dddddd;
                 cursor: pointer;
                 border-radius: 5px; 
-        
             }
             .select:focus,
             .select:hover{
@@ -380,22 +425,22 @@
             }
 
             #btnActivitySave{
-                position: absolute; left: 600px; top: 210px;
+                position: absolute; left: 750px; top: 210px; 
             }
             #btnActivityClear{
-                position: absolute; left: 730px; top: 210px;
+                position: absolute; left: 850px; top: 210px; 
             }
             #btnActivitySearch{
-                position: absolute; left: 860px; top: 210px;
+                position: absolute; left: 950px; top: 210px; 
             }
             #btnActivityClose{
-                position: absolute; left: 990px; top: 210px;
+                position: absolute; left: 1050px; top: 210px;
             }
             .grid{
-                position: absolute; left: 100px; top: 210px;
+                position: absolute; left: 200px; top: 210px;
             }
             .ActivityGrid{
-                position: absolute; left: 100px; top: 300px;
+                position: absolute; left: 150px; top: 300px;
             }
         </style>
     </head>
@@ -417,11 +462,14 @@
                 <label id="lblPatient"><b>Patient</b></label><br><br>
                 <select id="patientid" class="select"><option> --select-- </option></select>
 
-                <label id="lblFlag"><b>Attend Flag</b></label><br><br>
+                <label id="lblFlag"><b>Attended</b></label><br><br>
                 <input type="radio" id="attendflagY" name="yes" value="1">
                 <label id="lblFlagYes"><b>Yes</b></label>
                 <input type="radio" id="attendflagN" name="yes" value="2">
                 <label id="lblFlagNo"><b>No</b></label>
+
+                <label id="lblShift"><b>Shift</b></label><br><br>
+                <select id="shiftid" class="select"></select>
 
                 <label id="lblDuration"><b>Duration</b></label><br><br>
                 <input type="number" id="numduration" class="select">
