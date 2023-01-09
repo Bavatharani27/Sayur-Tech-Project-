@@ -10,6 +10,11 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/free-jqgrid/4.15.5/jquery.jqgrid.min.js"></script>
 
+        <script type="text/javascript">
+            $.jgrid.no_legacy_api = true;
+            $.jgrid.useJSON = true;
+        </script>
+
         <style>
             h1,h2{
                 text-align: center;
@@ -221,27 +226,36 @@
                             postData: doctor_shift,
                             datatype: "json",
                             mtype: 'POST',
+                            autoencode:false,
                             colModel:[{name:'Doctor Name'},
-                                    {name: 'Shift Type', width: 140, align:'center'}, 
+                                    {name: 'Shift Type', width: 140, align:'center', editable:true}, 
                                     {name: 'Shift Date', index: 'ShiftDate',width: 165, align:'center'},
                                     {name: 'Patient Name'},
                                     {name: 'Attended the patient', width: 200,align:'center'},
                                     {name: 'Id', hidden: true},
-                                    { name: "Delete", formatter: "actions", formatoptions: { editformbutton: false },
-                                    width: 65, align: "center", fixed: true, hidedlg: true, resizable: false, 
-                                    sortable: false, search: false, editable: false, viewable: false, align:'center'}, 
-                                    {name:'act', width:75}
+                                    {name:'Delete', index: 'act', width:75, datatype:'html', autoencode:false, autoescape:false}
                                     ],
+                            rowNum:10,
+   	                        rowList:[10,20,30],
+   	                        pager: '#prowed2',
+                            sortname: 'Id',
+                            viewrecords: true,
+                            sortorder: "desc",
                             gridComplete: function(){
                                 var ids = jQuery("#tblDoctorShift").jqGrid('getDataIDs');
                                 for(var i=0;i < ids.length;i++){
+                                    debugger;
                                     var cl = ids[i];
-                                    be = "<input style='height:22px;width:20px;' type='button' value='E' onclick=\"jQuery('#tblDoctorShift').editRow('"+cl+"');\"/>"; 
+                                   // be = "<input style='height:25px;width:60px;' type='button' value='Delete' onclick=\"jQuery('#tblDoctorShift').editRow('"+cl+"');\" />";
+                                    be = "<input style='height:22px;width:20px;' type='button' value='E' onclick=\"jQuery('#tblDoctorShift').editRow('"+cl+"');\"  />";
                                     jQuery("#tblDoctorShift").jqGrid('setRowData',ids[i],{act:be});
                                 }	
-                            }     
+                            },  
+                            editurl: "/"
                         });
                     }); 
+              //      jQuery("#tblDoctorShift").jqGrid('navGrid',"#prowed2",{edit:false,add:false,del:false});
+
                     $('#btnClear').click(function(e){
                         $('#doctorId').val("");
                         $('#shiftid').val("");
@@ -297,8 +311,10 @@
                     <button class="save" id="btnSave"><b>Save</b></button>
                     <button class="clear" id="btnClear"><b>Clear</b></button>
                     <button class="search" id="btnSearch"><b>Search</b></button>
+
                     <div class="grid">
                         <table id='tblDoctorShift'></table>
+                        <div id="prowed2"></div>
                     </div>
                 </div>
             </div>
