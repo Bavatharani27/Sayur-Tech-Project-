@@ -1,13 +1,17 @@
 <html>
     <head>
         <script src="https://code.jquery.com/jquery-3.6.1.js"></script>
+        <!--For Custome Alert-->
+        <script src= "https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src= "https://cdn.jsdelivr.net/npm/sweetalert2@11.4.8/dist/sweetalert2.all.min.js"></script>
+
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/themes/redmond/jquery-ui.min.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/free-jqgrid/4.15.5/css/ui.jqgrid.min.css">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/free-jqgrid/4.15.5/jquery.jqgrid.min.js"></script>
 
         <style>
-            h1{
+            h1,h2{
                 text-align: center;
             }
             body{
@@ -16,37 +20,31 @@
             }
             #doctorId{
                 width:170px;
-                position:absolute; left:70px;
-                top:110px;
+                position:absolute; left:70px;top:160px;
             }
             #shiftid{
-                position:absolute; left:330px;
-                top:110px;
+                position:absolute; left:330px;top:160px;
             }
             #date{
-                position:absolute; left:560px;
-                top:110px;
+                position:absolute; left:560px;top:160px;
             }
             #patientid{
-                position:absolute; left:825px;
-                top:110px;
+                position:absolute; left:825px;top:160px;
             }
             #lblFlag{
-                position:absolute; left:1050px; top:80px;
+                position:absolute; left:1050px; top:130px;
             }
             #lblFlagYes{
-                position:absolute; left:1080px; top:120px;
+                position:absolute; left:1080px; top:160px;
             }
             #lblFlagNo{
-                position:absolute; left:1170px; top:120px;
+                position:absolute; left:1170px; top:160px;
             }
             #attendflagY{
-                position:absolute; left:1050px;
-                top:120px;
+                position:absolute; left:1050px;top:160px;
             }
             #attendflagN{
-                position:absolute; left:1140px;
-                top:120px;
+                position:absolute; left:1140px;top:160px;
             }
             button{
                 background-color: #032666; 
@@ -65,7 +63,7 @@
                 background-color: white; 
                 color: black; 
                 border: 2px solid #032666;
-                position:absolute; left:1080px; top:190px;
+                position:absolute; left:1080px; top:210px;
               }
               .save:hover {
                 background-color: #032666;
@@ -76,7 +74,7 @@
                 background-color: white; 
                 color: black; 
                 border: 2px solid #032666;
-                position:absolute; left:1250px; top:190px;
+                position:absolute; left:1250px; top:210px;
               }
               .search:hover {
                 background-color: #032666;
@@ -87,7 +85,7 @@
                 background-color: white; 
                 color: black; 
                 border: 2px solid #032666;
-                position:absolute; left:1165px; top:190px;
+                position:absolute; left:1165px; top:210px;
               }
               .clear:hover {
                 background-color: #032666;
@@ -95,7 +93,7 @@
                 box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
               }
             .grid {
-                position:absolute; left:110px; top:210px;
+                position:absolute; left:70px; top:250px;
             }
             .select{
                 padding: 8px 30px;
@@ -133,6 +131,7 @@
         </style>
         <title>Shift Details</title>
         <h1><b>RK Hospital<b></h1>
+        <h2>Assignment of Shift & Patients to Doctors</h2>
             <script>
                 $(document).ready(function () {
                     $("#doctorId").val(function(){
@@ -144,8 +143,6 @@
                                     doctor_name += '<option value="' + data[i].id + '">' + data[i].name + "</option>";
                                 }
                                 $("#doctorId").html(doctor_name);
-                                var x = 10;
-                                x= 15;
                             },
                         });
                     });
@@ -182,11 +179,15 @@
                          var ShiftDt = $('#date').val();
                          ShiftDt = ShiftDt.substring(0,4) + '-'+ ShiftDt.substring(5,7) +'-'+ ShiftDt.substring(8,10);
                          var PatientId = $('#patientid').val();
-                         var AttendFlag = ''; //$('#attendflag').val();
+                         var AttendFlag = ''; 
                          if(attendflagY.checked == true)
                             AttendFlag = attendflagY.value;
-                         else
+                         if(attendflagN.checked == true)
                             AttendFlag = attendflagN.value;
+                         if(AttendFlag == ""){
+                            Swal.fire("Please choose attended flag");
+                            return false;
+                         }
                          var doctor_shift = {'DocId':DocId, 'ShiftId':ShiftId, 'ShiftDt':ShiftDt,'PatientId': PatientId, 'AttendFlag': AttendFlag};
                          var doctor_shift_url = "http://127.0.0.1:5000/assignShiftfordoctor";
                          $.ajax({
@@ -194,15 +195,16 @@
                              data: doctor_shift,
                              type: 'POST',
                              success:function(r){
-                                 alert("Assigned Successfully");
+                                Swal.fire("Assigned Successfully");
                              },
                              error:function(r){
-                                 alert("Error Occured when adding a shift");
+                                Swal.fire("Please fill all input fields");
                              }
                          });
                      });
 
                     $('#btnSearch').click(function(e){
+                        $('#tblDoctorShift').GridUnload(""); 
                         var DoctorId = $('#doctorId').val();
                         var ShiftId = $('#shiftid').val();
                         var ShiftDt = $('#date').val(); 
@@ -210,7 +212,7 @@
                         var AttendFlag = ''; //$('#attendflag').val(); 
                         if(attendflagY.checked == true)
                             AttendFlag = attendflagY.value;
-                        else
+                        if(attendflagN.checked == true)
                             AttendFlag = attendflagN.value;
 
                         var doctor_shift = {'DoctorId':DoctorId, 'ShiftId':ShiftId, 'ShiftDt':ShiftDt, 'PatientId':PatientId, 'AttendFlag': AttendFlag};
@@ -220,10 +222,24 @@
                             datatype: "json",
                             mtype: 'POST',
                             colModel:[{name:'Doctor Name'},
-                                    {name: 'Shift Type'}, 
-                                    {name: 'Shift Date', width: 350},
+                                    {name: 'Shift Type', width: 140, align:'center'}, 
+                                    {name: 'Shift Date', index: 'ShiftDate',width: 165, align:'center'},
                                     {name: 'Patient Name'},
-                                    {name: 'Attended Flag'}]
+                                    {name: 'Attended the patient', width: 200,align:'center'},
+                                    {name: 'Id', hidden: true},
+                                    { name: "Delete", formatter: "actions", formatoptions: { editformbutton: false },
+                                    width: 65, align: "center", fixed: true, hidedlg: true, resizable: false, 
+                                    sortable: false, search: false, editable: false, viewable: false, align:'center'}, 
+                                    {name:'act', width:75}
+                                    ],
+                            gridComplete: function(){
+                                var ids = jQuery("#tblDoctorShift").jqGrid('getDataIDs');
+                                for(var i=0;i < ids.length;i++){
+                                    var cl = ids[i];
+                                    be = "<input style='height:22px;width:20px;' type='button' value='E' onclick=\"jQuery('#tblDoctorShift').editRow('"+cl+"');\"/>"; 
+                                    jQuery("#tblDoctorShift").jqGrid('setRowData',ids[i],{act:be});
+                                }	
+                            }     
                         });
                     }); 
                     $('#btnClear').click(function(e){
@@ -235,6 +251,24 @@
                         attendflagN.checked = false; 
                         $('#tblDoctorShift').GridUnload(""); 
                     });
+                   // $('#tblDoctorShift tbody').on('click', 'td i[title="Delete"]', function(e){
+                    function ShiftDelete(Id){
+                        var sData = $('#tblDoctorShift').dataTable().fnGetData(this.closest('tr'));
+                       // var rowData = $("#tblDoctorShift").getRowData(this);
+                        var AssignId = sData.Id;
+                        var DelData = {'AssignId':AssignId};
+                        $.ajax({
+                            url: '/deletedoctorshift' +'/'+ AssignId,
+                            data: DelData,
+                            success:function(r){
+                                Swal.fire("Deleted Successfully");
+                            },
+                            error:function(r){
+                                Swal.fire("Error Occured when Deleting a shift");
+                            }
+                        });
+                    }
+                  //  });
                 });
             </script>
     </head>
@@ -242,19 +276,19 @@
         <div class="container">    
             <div class="row">
                 <div class="col-md-6">
-                    <label style="position:absolute; left:70px; top:80px;">Doctor</label><br><br>
+                    <label style="position:absolute; left:70px; top:130px;">Doctor</label><br><br>
                     <select name="doctor" id="doctorId" class="select"> </select>
                     
-                    <label style="position:absolute; left:330px; top:80px;">Shift</label><br><br>
+                    <label style="position:absolute; left:330px; top:130px;">Shift</label><br><br>
                     <select name="shift" id="shiftid" class="select"></select>
 
-                    <label style="position:absolute; left:560px; top:80px;">Date</label><br><br>
+                    <label style="position:absolute; left:560px; top:130px;">Date</label><br><br>
                     <input type="date" id="date" class="date">
 
-                    <label style="position:absolute; left:825px; top:80px;">Patient</label><br><br>
+                    <label style="position:absolute; left:825px; top:130px;">Patient</label><br><br>
                     <select name="patient" id="patientid" class="select"><option> --select-- </option></select>
 
-                    <label id="lblFlag"><b>Attend Flag</b></label><br><br>
+                    <label id="lblFlag"><b>Attended the patient</b></label><br><br>
                     <input type="radio" id="attendflagY" name="yes" value="1">
                     <label id="lblFlagYes"><b>Yes</b></label>
                     <input type="radio" id="attendflagN" name="yes" value="2">
