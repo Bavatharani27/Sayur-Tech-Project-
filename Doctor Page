@@ -2,7 +2,12 @@
     <head>
         <title>Doctor</title>
         <h1>RK Hospital</h1>
+        <h2>Shift & Activity Details of Doctor</h2>
         <script src="https://code.jquery.com/jquery-3.6.1.js"></script>
+        <!--For Custome Alert-->
+        <script src= "https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src= "https://cdn.jsdelivr.net/npm/sweetalert2@11.4.8/dist/sweetalert2.all.min.js"></script>
+
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/themes/redmond/jquery-ui.min.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/free-jqgrid/4.15.5/css/ui.jqgrid.min.css">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
@@ -40,6 +45,7 @@
                     $('#lbldoctorName').show();
                     $('#doctorName').show();
                     $('#doctorName').val(localStorage.getItem("UserName"));
+                    doctorName.disabled = true;
                     $('#currentDate').show();
                     $('#lblcurrentDate').show();
                     $('#btnSearch').show();
@@ -51,6 +57,7 @@
                     $('#lbldoctorName').show();
                     $('#doctorName').show();
                     $('#doctorName').val(localStorage.getItem("UserName"));
+                    doctorName.disabled = true;
                     $('#currentDate').show();
                     $('#lblcurrentDate').show();
                     $('#lblPatient').show();
@@ -97,6 +104,7 @@
                 });
 
                 $('#btnSearch').click(function(e){
+                    $('#tblDoctorDetails').GridUnload(""); 
                     var DoctorId = localStorage.getItem("UserId");
                     var ShiftDt = $('#currentDate').val(); 
                     var doctor_shift = {'DoctorId':DoctorId, 'ShiftDt':ShiftDt};
@@ -105,11 +113,11 @@
                         postData: doctor_shift,
                         datatype: "json",
                         mtype: 'POST',
-                        colModel:[{name:'Doctor Name'},
-                                {name: 'Shift Type'}, 
-                                {name: 'Shift Date', width: 350},
-                                {name: 'Patient Name'},
-                                {name: 'Attended Flag'}]
+                        colModel:[{name:'Doctor Name', align:'center'},
+                                {name: 'Shift Type', align:'center'}, 
+                                {name: 'Shift Date', width: 165, align:'center'},
+                                {name: 'Patient Name', align:'center'},
+                                {name: 'Attended the patient', width: 200, align:'center'}]
                     });
                 });
 
@@ -134,26 +142,35 @@
                     var DocId = localStorage.getItem("UserId");
                     var CurrentDt = $('#currentDate').val();
                     CurrentDt = CurrentDt.substring(0,4) + '-'+ CurrentDt.substring(5,7) +'-'+ CurrentDt.substring(8,10);
+                    var today = new Date();
+                    var dd = String(today.getDate()).padStart(2, '0');
+                    var mm = String(today.getMonth() + 1).padStart(2, '0');
+                    var yyyy = today.getFullYear();
+                    today = yyyy + '-' + mm + '-' + dd;
                     var PatientId = $('#patientid').val();
-                    var AttendFlag = ''; // $('#attendflag').val();
+                    var AttendFlag = ''; 
                     if(attendflagY.checked == true)
                         AttendFlag = attendflagY.value;
-                    else
+                    if(attendflagN.checked == true)
                         AttendFlag = attendflagN.value;
                     var Duration = $('#numduration').val();
                     var ShiftId = $('#shiftid').val();
 
-                    var doctor_activity = {'DocId':DocId, 'CurrentDt':CurrentDt, 'PatientId': PatientId, 'AttendFlag': AttendFlag, 'Duration':Duration, 'ShiftId':ShiftId};
+                    var doctor_activity = {'DocId':DocId, 'CurrentDt':CurrentDt, 'PatientId': PatientId, 'AttendFlag': AttendFlag, 
+                        'Duration':Duration, 'ShiftId':ShiftId, 'today': today};
                     var doctor_activity_url = "/doctoractivitysave";
                     $.ajax({
                         url: doctor_activity_url,
                         data: doctor_activity,
                         type: 'POST',
                         success:function(r){
-                            alert("Added Successfully");
+                            Swal.fire("Added Successfully");
                         },
                         error:function(r){
-                            alert("Error Occured when adding Activity");
+                            if(DocId == "0" || PatientId == "0" || AttendFlag == "" || ShiftId == "0" || Duration == "")
+                                Swal.fire("Please fill all input fields");
+                            else
+                                Swal.fire("Shift not assigned for this date");
                         }
                     });
                 });
@@ -169,14 +186,19 @@
                 });
 
                 $('#btnActivitySearch').click(function(e){
+                    $('#tblDoctorActivityDetails').GridUnload(""); 
                     var AttendFlag = '';
                     var DoctorId = localStorage.getItem("UserId");
                     var CurrentDt = $('#currentDate').val();
                     CurrentDt = CurrentDt.substring(0,4) + '-'+ CurrentDt.substring(5,7) +'-'+ CurrentDt.substring(8,10);
+                    if(CurrentDt == "--"){
+                        Swal.fire("Please choose activity date");
+                        return false;
+                    }
                     var PatientId = $('#patientid').val();
                     if(attendflagY.checked == true)
                         AttendFlag = attendflagY.value;
-                    else
+                    if(attendflagN.checked == true)
                         AttendFlag = attendflagN.value;
                  //   var AttendFlag = $('#attendflagY').val();
                     var Duration = $('#numduration').val();
@@ -188,11 +210,13 @@
                         postData: doctor_activity_details,
                         datatype: "json",
                         mtype: 'POST',
-                        colModel:[{name:'Doctor Name'}, {name:'Shift Type'},
-                                {name: 'Activity Date', width: 350},
-                                {name: 'Patient Name'},
-                                {name: 'Attended Flag'}, 
-                                {name: 'Duration'}]
+                        pageable: true,
+                        colModel:[{name:'Doctor Name', align:'center'}, 
+                                {name:'Shift Type',width: 140, align:'center'},
+                                {name: 'Activity Date', width: 165,align:'center'},
+                                {name: 'Patient Name', align:'center'},
+                                {name: 'Attended the patient', width: 190, align:'center'}, 
+                                {name: 'Duration', width: 100, align:'center'}]
                     });
                 });
 
@@ -222,12 +246,11 @@
         </script>
     
         <style>
-            h1{
+            h1,h2{
                 text-align: center;
             }
             body{
                 background-image:url("https://i.pinimg.com/originals/b5/36/6e/b5366e76dd1d77389dc35e5dc3a6e238.jpg");
-                background-repeat: no-repeat;
             }
             .docpage{
                 padding-left: 90px;
@@ -318,10 +341,10 @@
                 box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
               }
               #lbldoctorName{
-                    position: absolute; left: 350px; top: 100px;
+                    position: absolute; left: 350px; top: 130px;
               }
               #doctorName{
-                position: absolute; left: 350px; top: 130px;
+                position: absolute; left: 350px; top: 160px;
               }
               .text{
                 padding: 8px 30px;
@@ -341,43 +364,44 @@
                 background: #ffffff;
             }
               #lblcurrentDate{
-                position: absolute; left: 550px; top: 100px;
-            }
-            #currentDate{
                 position: absolute; left: 550px; top: 130px;
             }
-            #lblPatient{
-                position: absolute; left: 750px; top: 100px;
+            #currentDate{
+                position: absolute; left: 550px; top: 160px;
+                width: 155px;
             }
-            #patientid{
+            #lblPatient{
                 position: absolute; left: 750px; top: 130px;
             }
+            #patientid{
+                position: absolute; left: 750px; top: 160px;
+            }
             #lblFlag{
-                position: absolute; left: 950px; top: 100px;
+                position: absolute; left: 950px; top: 130px;
             }
             #lblFlagYes{
-                position: absolute; left: 980px; top: 140px;
+                position: absolute; left: 980px; top: 160px;
             }
             #lblFlagNo{
-                position: absolute; left: 1080px; top: 140px;
+                position: absolute; left: 1080px; top: 160px;
             }
             #attendflagY{
-                position: absolute; left: 950px; top: 140px;
+                position: absolute; left: 950px; top: 160px;
             }
             #attendflagN{
-                position: absolute; left: 1050px; top: 140px;
+                position: absolute; left: 1050px; top: 160px;
             }
             #lblShift{
-                position: absolute; left: 350px; top: 190px;
+                position: absolute; left: 350px; top: 210px;
             }
             #shiftid{
-                position: absolute; left: 350px; top: 220px;  
+                position: absolute; left: 350px; top: 240px;  
             }
             #lblDuration{
-                position: absolute; left: 550px; top: 190px;
+                position: absolute; left: 550px; top: 210px;
             }
             #numduration{
-                position: absolute; left: 550px; top: 220px;
+                position: absolute; left: 550px; top: 240px;
                 width: 100px;
             }
             .select{
@@ -398,32 +422,32 @@
                 background: #ffffff;
             }
             #btnSearch{
-                position: absolute; left: 750px; top: 110px;
+                position: absolute; left: 750px; top: 140px;
             }
             #btnClear{
-                position: absolute; left: 870px; top: 110px;
+                position: absolute; left: 870px; top: 140px;
             }
             #btnClose{
-                position: absolute; left: 980px; top: 110px;
+                position: absolute; left: 980px; top: 140px;
             }
 
             #btnActivitySave{
-                position: absolute; left: 750px; top: 210px; 
+                position: absolute; left: 750px; top: 225px; 
             }
             #btnActivityClear{
-                position: absolute; left: 850px; top: 210px; 
+                position: absolute; left: 850px; top: 225px; 
             }
             #btnActivitySearch{
-                position: absolute; left: 950px; top: 210px; 
+                position: absolute; left: 950px; top: 225px; 
             }
             #btnActivityClose{
-                position: absolute; left: 1050px; top: 210px;
+                position: absolute; left: 1050px; top: 225px;
             }
             .grid{
-                position: absolute; left: 100px; top: 210px;
+                position: absolute; left: 280px; top: 225px;
             }
             .ActivityGrid{
-                position: absolute; left: 100px; top: 300px;
+                position: absolute; left: 250px; top: 305px;
             }
         </style>
     </head>
