@@ -60,7 +60,7 @@ body {font-family: Arial;}
   <button class="tablinks" onclick="openCity(event, 'Home')" style="color:white;position:absolute;right:850px;padding-top:12px;font-size:20px;width:100px">Home</button>
   <button class="tablinks" onclick="openCity(event, 'Contact')" style="color:white;position:absolute;right:600px;padding-top:12px;font-size:20px;width:130px">Contact</button>
   <button class="tablinks" onclick="openCity(event, 'About Us')" style="color:white;position:absolute;right:360px;padding-top:12px;font-size:20px;width:140px">AboutUs</button>
-  <button class="tablinks" onclick="openCity(event, 'Menu')" style="color:white;position:absolute;right:140px;padding-top:12px;font-size:20px;width:100px">Menu</button>
+  <button class="tablinks" onclick="openCity(event, 'Menu')" style="color:white;position:absolute;right:140px;padding-top:12px;font-size:20px;width:100px">Services</button>
 </div>
 
 <div id="Home" class="tabcontent">
@@ -78,13 +78,13 @@ body {font-family: Arial;}
         box-sizing: inherit;
         }
         .doctor{
-          position:absolute; left:510px; top:150px;
+          position:absolute; left:610px; top:280px;
         }
         .nurse{
-          position:absolute; left:510px; top:300px;
+          position:absolute; left:610px; top:380px;
         }
         .admin{
-          position:absolute; left:510px; top:450px;
+          position:absolute; left:610px; top:480px;
         }
         .container {
             padding: 0 8px;
@@ -145,20 +145,17 @@ body {font-family: Arial;}
     <div class="row" style="padding-top:35px;padding-left:350px;">
         <div class="container"style="padding-top:10px;">
             <div class="doctor">
-                    <h2>Are You a Doctor?</h2>
-                    <button onclick="location.href = 'http://127.0.0.1:5000/login';" id="doctor" class="button1">Click Here</button>
+                    <button onclick="location.href = 'http://127.0.0.1:5000/login';" id="doctor" class="button1"><b>Doctor Login</b></button>
             </div>
         </div>
         <div class="container"style="padding-top:10px">
             <div class="admin">
-                    <h2>Are You a Admin Staff?</h2>
-                    <button onclick="location.href = 'http://127.0.0.1:5000/login';" id="btnClickHere" class="button3">Click Here</button>
+                    <button onclick="location.href = 'http://127.0.0.1:5000/login';" id="btnClickHere" class="button3"><b>Admin Login</b></button>
             </div>
         </div>
         <div class="container"style="padding-top:10px">
             <div class="nurse">
-                    <h2>Are You a Nurse?</h2>
-                    <button id="nurse" class="button2">Click Here</button>
+                    <button id="nurse" class="button2"><b>Nurse Login</b></button>
             </div>
         </div>
     </div>
@@ -190,23 +187,77 @@ body {font-family: Arial;}
       border-top: none;
       border-bottom: none;
     }
+    .options{
+      align:center;
+    }
+    .time{
+      position: absolute; left: 500px; top: 260px;
+    }
+    .imgClock{
+      width:20px;
+      border-radius: 20px;
+      position: absolute; left: 460px; top: 260px;
+    }
+    .address{
+      position: absolute; left: 500px; top: 300px;
+    }
+    .imgAddress{
+      width:20px;
+      border-radius: 20px;
+      position: absolute; left: 460px; top: 300px;
+    }
+    .phone{
+      position: absolute; left: 500px; top: 340px;
+    }
+    .imgPhone{
+      width:20px;
+      border-radius: 20px;
+      position: absolute; left: 460px; top: 340px;
+    }
+    .mobile{
+      position: absolute; left: 500px; top: 380px;
+    }
+    .imgMobile{
+      width:20px;
+      border-radius: 20px;
+      position: absolute; left: 460px; top: 380px;
+    }
+    .mail{
+      position: absolute; left: 500px; top: 420px;
+    }
+    .imgMail{
+      width:20px;
+      border-radius: 20px;
+      position: absolute; left: 460px; top: 420px;
+    }
+    .map{
+      position: absolute; left: 500px; top: 460px;
+    }
+    .imgMap{
+      width:25px;
+      border-radius: 20px;
+      position: absolute; left: 460px; top: 460px;
+    }
+
   </style>
   <h3>RK Hospital - Madurai</h3>
-  <i class="fas fa-clock"></i>
-  <!--span><i class="far fa-clock" style="padding-right:10px;"></i></span!-->
-  <p>7:30 am to 5 pm: All days except Sunday</p> 
-  <p>1, Anna Nagar, Madurai - 625020 Tamil Nadu, India</p>
-  <p>For patient enquiries: (0132) 235 2106</p>
-  <p>(0253) 235 5170</p>
-  <p><a href="patientfeedback@aravind.org, patientcare@aravind.org">patientfeedback@aravind.org, patientcare@aravind.org</a></p>
-  <p><a href="View location in map">View location in map</a></p>
+  
+  <div class="options">
+  <img src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThPR76Z8cwf7jUOalHIrpFJqxHMJ7MF0vLGQ&usqp=CAU' class="imgClock"/>
+  <label class="time"> 7:30 am to 5 pm: All days except Sunday</label> <br><br>
+  <img src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTBTaMcK2MTFFHCG7LOxS4LqcXIt8xtRjkFQw&usqp=CAU' class="imgAddress"/>
+  <label class="address">1, Anna Nagar, Madurai - 625020 Tamil Nadu, India</label> <br><br>
+  <img src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSP56B90ceDIDPb8HH-jHWjOqZelrVbpv3nJA&usqp=CAU' class="imgPhone"/>
+  <label class="phone">For patient enquiries: (0132) 235 2106</label> <br><br>
+  <img src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT1JN1nLSlDQG5usSbXYWxie3uIVkZ8e1slVi7t8hIAIrV6KBNUnB8-xRaK0iYeTmQLelA&usqp=CAU' class="imgMobile"/>
+  <label class="mobile">(0253) 235 5170</label> <br><br>
+  <img src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtXmXDjMI9S56iN7kluG7cX5ozAnqq-TEgWA&usqp=CAU' class="imgMail"/>
+  <label class="mail"><a href="patientfeedback@rk.org, patientcare@rk.org">patientfeedback@rk.org, patientcare@rk.org</a></label> <br><br>
+  <img src='data:image/png;base64,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' class="imgMap"/>
+  <label class="map"><a href="View location in map">View location in map</a></label> <br><br>
   </div>
-  <!--span><i class="far fa-address-book" style="padding-right: 10px;"></i></span><p>1, Anna Nagar, Madurai - 625020 Tamil Nadu, India</p>
-  <span><i class="fas fa-tty" style="padding-right: 10px;"></i></span><p>For patient enquiries: (0132) 235 2106</p>
-  <span><i class="fas fa-mobile-alt" style="padding-right: 10px;"></i></span><p>(0253) 235 5170</p>
-  <span><i class="fas fa-at" style="padding-right: 10px;"></i></span><p><a href="patientfeedback@aravind.org, patientcare@aravind.org">patientfeedback@aravind.org, patientcare@aravind.org</a></p>
-  <span><i class="fas fa-location-arrow" style="padding-right: 10px;"></i></span><p><a href="View location in map">View location in map</a></p!-->
-</div>
+  </div>
+  </div>
 
 <div id="About Us" class="tabcontent">
     <style>
@@ -218,7 +269,6 @@ body {font-family: Arial;}
         html {
         box-sizing: border-box;
         }
-
         *, *:before, *:after {
         box-sizing: inherit;
         }
@@ -228,12 +278,6 @@ body {font-family: Arial;}
         width: 33.3%;
         margin-bottom: 16px;
         padding: 0 8px;
-        }
-
-        .cardAbout {
-        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-        margin: 8px;
-        background-color:#e6f9ff;
         }
 
         .about-section {
@@ -254,13 +298,24 @@ body {font-family: Arial;}
         }
 
         .title {
-        color: grey;
+        color: #0E099F;
         }
 
         .button:hover {
         background-color: #555;
         }
-
+        #mission1{
+          position:relative; left:5px;
+        }
+        #mission2{
+          position:relative; left:150px;
+        }
+        #mission3{
+          position:relative; left:135px;
+        }
+        #mission4{
+          position:relative; left:185px;
+        }
         @media screen and (max-width: 650px) {
         .columnAbout {
             width: 100%;
@@ -270,33 +325,30 @@ body {font-family: Arial;}
     </style>
     <div class="row" style="padding-top:50px">
         <div class="columnAbout">
-          <div class="cardAbout">
-            <div class="containerAbout"style="padding-top:10px">
-              <h2>Jane Doe</h2>
-              <p class="title">CEO & Founder</p>
-              <p>Some text that describes me lorem ipsum ipsum lorem.</p>
+            <div class="containerAbout"style="padding-top:10px; position:absolute; left:200px;">
+              <h2>Bavatharani</h2>
+              <p class="title"><b>CEO & Founder</b></p>
             </div>
-          </div>
+          
         </div>
       
         <div class="columnAbout">
-          <div class="cardAbout">
-            <div class="containerAbout"style="padding-top:10px">
-              <h2>Mike Ross</h2>
-              <p class="title">Chairman & Trustee</p>
-              <p>Some text that describes me lorem ipsum ipsum lorem.</p>
+            <div class="containerAbout"style="padding-top:10px; position:absolute; left:200px; top:380px;">
+              <h2>Soundarya</h2>
+              <p class="title"><b>Chairman & Trustee</b></p>
             </div>
-          </div>
         </div>
         
         <div class="columnAbout">
-          <div class="cardAbout">
-            <div class="containerAbout"style="padding-top:10px">
+            <div class="containerAbout"style="padding-top:10px; position:absolute; left:350px;">
               <h2>Mission & Vision</h2>
-              <p>World-Class care within everybody’s reach.</p>
-              <p>No man is too poor to afford first-grade medical treatment.</p>
+              
+              <label class="title" id='mission1'><b>To provide Hope, Care and Cure.</b></label> <br><br>
+              <label class="title" id='mission2'><b>To provide accessible, high quality, cost effective healthcare to one all.</b></label> <br><br>
+              <label class="title" id='mission3'><b>To be the centre of excellence for medical research and academics.</b></label><br><br>
+              <label class="title" id='mission4'><b>To serve with a patient's first motto and to work towards a patient-centered care.</b></label>
+             
             </div>
-          </div>
         </div>
     </div>
   </div>
@@ -322,22 +374,29 @@ body {font-family: Arial;}
     margin-bottom: 16px;
     padding: 0 10px 0 390px;
     }
-
-    .cardMenu {
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-    margin: 8px;
-    background-color:#e6f9ff;
-    padding-left:15px;
-    }
     .containerMenu {
     padding: 0 16px;
     padding-left:10px;
     }
-
     .containerMenu::after, .row::after {
     content: "";
     clear: both;
     display: table;
+    }
+    #service1{
+      position:relative; left:5px;
+    }
+    #service2{
+      position:relative; left:20px;
+    }
+    #service3{
+      position:relative; left:55px;
+    }
+    #service4{
+      position:relative; left:25px;
+    }
+    #service5{
+      position:relative; left:40px;
     }
     @media screen and (max-width: 650px) {
     .columnMenu{
@@ -347,16 +406,13 @@ body {font-family: Arial;}
     }
 </style>
   <div class="columnMenu">
-    <div class="cardMenu">
-      <div class="containerMenu"style="padding-top:10px;font-size:50px">
-        <ul>
-          <li><a href="#" onclick="location.href = 'http://127.0.0.1:5000/summary';" id="summary">Summary</a></li>
-          <li><a href="#" onclick="location.href = 'http://127.0.0.1:5000/doctorlist';" id="doctor">Doctors</a></li>
-          <li><a href="#" onclick="location.href = 'http://127.0.0.1:5000/nurselist';" id="nurse">Nurses</a></li>
-          <li><a href="#">Out Patients</a></li>
-        </ul>
+      <div class="containerMenu"style="padding-top:20px;font-size:30px">
+        <label class="title" id='service1'>Surgical Services</label><br><br>
+        <label class="title" id='service2'>Obstetrical Services</label><br><br>
+        <label class="title" id='service3'>Anesthesiology Services</label><br><br>
+        <label class="title" id='service4'>Laboratory Services</label><br><br>
+        <label class="title" id='service5'>Outpatient Department</label>
       </div>
-    </div>
   </div>
 </div>
 <script>
