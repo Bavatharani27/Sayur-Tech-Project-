@@ -2,7 +2,12 @@
     <head>
         <title>Doctor</title>
         <h1>RK Hospital</h1>
+        <h2>Shift & Activity Details of Nurse</h2>
         <script src="https://code.jquery.com/jquery-3.6.1.js"></script>
+        <!--For Custome Alert-->
+        <script src= "https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src= "https://cdn.jsdelivr.net/npm/sweetalert2@11.4.8/dist/sweetalert2.all.min.js"></script>
+
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/themes/redmond/jquery-ui.min.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/free-jqgrid/4.15.5/css/ui.jqgrid.min.css">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
@@ -40,6 +45,7 @@
                     $('#lblnurseName').show();
                     $('#nurseName').show();
                     $('#nurseName').val(localStorage.getItem("UserName"));
+                    nurseName.disabled = true;
                     $('#currentDate').show();
                     $('#lblcurrentDate').show();
                     $('#btnSearch').show();
@@ -51,6 +57,7 @@
                     $('#lblnurseName').show();
                     $('#nurseName').show();
                     $('#nurseName').val(localStorage.getItem("UserName"));
+                    nurseName.disabled = true;
                     $('#currentDate').show();
                     $('#lblcurrentDate').show();
                     $('#lblPatient').show();
@@ -96,6 +103,7 @@
                 });
 
                 $('#btnSearch').click(function(e){
+                    $('#tblNurseDetails').GridUnload(""); 
                     var NurseId = localStorage.getItem("UserId");
                     var ShiftDt = $('#currentDate').val(); 
                     var nurse_shift = {'NurseId':NurseId, 'ShiftDt':ShiftDt};
@@ -104,9 +112,9 @@
                         postData: nurse_shift,
                         datatype: "json",
                         mtype: 'POST',
-                        colModel:[{name:'Nurse Name'},
-                                {name: 'Shift Type'}, 
-                                {name: 'Shift Date', width: 350}]
+                        colModel:[{name:'Nurse Name', align:'center'},
+                                {name: 'Shift Type', align:'center'}, 
+                                {name: 'Shift Date', width: 165, align:'center'}]
                     });
                 });
 
@@ -131,26 +139,36 @@
                     var NurseId = localStorage.getItem("UserId");
                     var CurrentDt = $('#currentDate').val();
                     CurrentDt = CurrentDt.substring(0,4) + '-'+ CurrentDt.substring(5,7) +'-'+ CurrentDt.substring(8,10);
+                    var today = new Date();
+                    var dd = String(today.getDate()).padStart(2, '0');
+                    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+                    var yyyy = today.getFullYear();
+                    today = yyyy + '-' + mm + '-' + dd;
                     var PatientId = $('#patientid').val();
                     var AttendFlag = ''; // $('#attendflag').val();
                     if(attendflagY.checked == true)
                         AttendFlag = attendflagY.value;
-                    else
+                    if(attendflagN.checked == true)
                         AttendFlag = attendflagN.value;
                     var Duration = $('#numduration').val();
                     var ShiftId = $('#shiftid').val();
 
-                    var nurse_activity = {'NurseId':NurseId, 'CurrentDt':CurrentDt, 'PatientId': PatientId, 'AttendFlag': AttendFlag, 'Duration':Duration, 'ShiftId':ShiftId};
+                    var nurse_activity = {'NurseId':NurseId, 'CurrentDt':CurrentDt, 'PatientId': PatientId, 'AttendFlag': AttendFlag, 'Duration':Duration, 
+                        'ShiftId':ShiftId, 'today': today};
                     var nurse_activity_url = "/nurseactivitysave";
                     $.ajax({
                         url: nurse_activity_url,
                         data: nurse_activity,
                         type: 'POST',
                         success:function(r){
-                            alert("Added Successfully");
+                                Swal.fire("Added Successfully");
                         },
                         error:function(r){
-                            alert("Error Occured when adding Activity");
+                            if(NurseId == "0" || PatientId == "0" || AttendFlag == "" || ShiftId == "0" || Duration == "")
+                                Swal.fire("Please fill all input fields");
+                            else
+                                Swal.fire("Shift not assigned for this date");
+                            
                         }
                     });
                 });
@@ -166,14 +184,19 @@
                 });
 
                 $('#btnActivitySearch').click(function(e){
+                    $('#tblNurseActivityDetails').GridUnload(""); 
                     var AttendFlag = '';
                     var NurseId = localStorage.getItem("UserId");
                     var CurrentDt = $('#currentDate').val();
                     CurrentDt = CurrentDt.substring(0,4) + '-'+ CurrentDt.substring(5,7) +'-'+ CurrentDt.substring(8,10);
+                    if(CurrentDt == "--"){
+                        Swal.fire("Please choose activity date");
+                        return false;
+                    }
                     var PatientId = $('#patientid').val();
                     if(attendflagY.checked == true)
                         AttendFlag = attendflagY.value;
-                    else
+                    if(attendflagN.checked == true)
                         AttendFlag = attendflagN.value;
                  //   var AttendFlag = $('#attendflagY').val();
                     var Duration = $('#numduration').val();
@@ -186,11 +209,12 @@
                         postData: nurse_activity_details,
                         datatype: "json",
                         mtype: 'POST',
-                        colModel:[{name:'Nurse Name'}, {name:'Shift Type'},
-                                {name: 'Activity Date', width: 350},
+                        colModel:[{name:'Nurse Name'}, 
+                                {name:'Shift Type', width: 140, align:'center'},
+                                {name: 'Activity Date', width: 165, align:'center'},
                                 {name: 'Patient Name'},
-                                {name: 'Attended Flag'}, 
-                                {name: 'Duration'}]
+                                {name: 'Attended the patient', width: 190, align:'center'}, 
+                                {name: 'Duration', width: 100, align:'center'}]
                     });
                 });
 
@@ -221,7 +245,7 @@
         </script>
     
         <style>
-            h1{
+            h1,h2{
                 text-align: center;
             }
             body{
@@ -319,10 +343,10 @@
                 box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
               }
               #lblnurseName{
-                    position: absolute; left: 350px; top: 100px;
+                    position: absolute; left: 350px; top: 130px;
               }
               #nurseName{
-                position: absolute; left: 350px; top: 130px;
+                position: absolute; left: 350px; top: 160px;
               }
               .text{
                 padding: 8px 30px;
@@ -359,43 +383,43 @@
                 background: #ffffff;
             }
               #lblcurrentDate{
-                position: absolute; left: 550px; top: 100px;
-            }
-            #currentDate{
                 position: absolute; left: 550px; top: 130px;
             }
-            #lblPatient{
-                position: absolute; left: 750px; top: 100px;
+            #currentDate{
+                position: absolute; left: 550px; top: 160px;
             }
-            #patientid{
+            #lblPatient{
                 position: absolute; left: 750px; top: 130px;
             }
+            #patientid{
+                position: absolute; left: 750px; top: 160px;
+            }
             #lblFlag{
-                position: absolute; left: 950px; top: 100px;
+                position: absolute; left: 950px; top: 130px;
             }
             #lblFlagYes{
-                position: absolute; left: 980px; top: 140px;
+                position: absolute; left: 980px; top: 160px;
             }
             #lblFlagNo{
-                position: absolute; left: 1080px; top: 140px;
+                position: absolute; left: 1080px; top: 160px;
             }
             #attendflagY{
-                position: absolute; left: 950px; top: 140px;
+                position: absolute; left: 950px; top: 160px;
             }
             #attendflagN{
-                position: absolute; left: 1050px; top: 140px;
+                position: absolute; left: 1050px; top: 160px;
             }
             #lblShift{
-                position: absolute; left: 350px; top: 190px;
+                position: absolute; left: 350px; top: 210px;
             }
             #shiftid{
-                position: absolute; left: 350px; top: 220px;  
+                position: absolute; left: 350px; top: 240px;  
             }
             #lblDuration{
-                position: absolute; left: 550px; top: 190px;
+                position: absolute; left: 550px; top: 210px;
             }
             #numduration{
-                position: absolute; left: 550px; top: 220px;
+                position: absolute; left: 550px; top: 240px;
                 width: 100px;
             }
             .select{
@@ -415,29 +439,29 @@
                 background: #ffffff;
             }
             #btnSearch{
-                position: absolute; left: 750px; top: 110px;
+                position: absolute; left: 750px; top: 140px;
             }
             #btnClear{
-                position: absolute; left: 870px; top: 110px;
+                position: absolute; left: 870px; top: 140px;
             }
             #btnClose{
-                position: absolute; left: 980px; top: 110px;
+                position: absolute; left: 980px; top: 140px;
             }
 
             #btnActivitySave{
-                position: absolute; left: 750px; top: 210px; 
+                position: absolute; left: 750px; top: 230px; 
             }
             #btnActivityClear{
-                position: absolute; left: 850px; top: 210px; 
+                position: absolute; left: 850px; top: 230px; 
             }
             #btnActivitySearch{
-                position: absolute; left: 950px; top: 210px; 
+                position: absolute; left: 950px; top: 230px; 
             }
             #btnActivityClose{
-                position: absolute; left: 1050px; top: 210px;
+                position: absolute; left: 1050px; top: 230px;
             }
             .grid{
-                position: absolute; left: 200px; top: 210px;
+                position: absolute; left: 400px; top: 230px;
             }
             .ActivityGrid{
                 position: absolute; left: 150px; top: 300px;
@@ -462,7 +486,7 @@
                 <label id="lblPatient"><b>Patient</b></label><br><br>
                 <select id="patientid" class="select"><option> --select-- </option></select>
 
-                <label id="lblFlag"><b>Attended</b></label><br><br>
+                <label id="lblFlag"><b>Attended the patient</b></label><br><br>
                 <input type="radio" id="attendflagY" name="yes" value="1">
                 <label id="lblFlagYes"><b>Yes</b></label>
                 <input type="radio" id="attendflagN" name="yes" value="2">
