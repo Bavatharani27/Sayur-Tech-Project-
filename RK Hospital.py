@@ -159,32 +159,38 @@ def create_new_activity_for_doctor():
     AttendFlag = request.form.get('AttendFlag')
     Duration = request.form.get('Duration')
     ShiftId = request.form.get('ShiftId')
+    today = request.form.get('today')
     
     doctor_activity = [(logged_doctor_Id, CurrentDt, PatientId, AttendFlag, Duration, ShiftId)]
-    stmt = "Insert into tbl_doctoractivity (Doctor_Id, Activity_Date, Patient_Id, Attend_Flag, Duration, Shift_Id) values(%s, %s, %s, %s, %s, %s)"
-    mycursor.executemany(stmt, doctor_activity)
-    
-    updatestmt = "update tbl_shiftpatientfordoctor set tbl_shiftpatientfordoctor.attended_Flag = " + AttendFlag + "\
-         where " 
-         
-    patient_clause = ''
-    date_clause = ''
+    date_check = "select Shift_Date from tbl_shiftpatientfordoctor where Shift_Date = '" + str(CurrentDt) + "' and Nurse_Id = " + logged_doctor_Id
+    print(date_check)
+    if CurrentDt > today:
+        return 0
+    else:
+        stmt = "Insert into tbl_doctoractivity (Doctor_Id, Activity_Date, Patient_Id, Attend_Flag, Duration, Shift_Id) values(%s, %s, %s, %s, %s, %s)"
+        mycursor.executemany(stmt, doctor_activity)
         
-    if(PatientId != '' and PatientId != '0'):
-        patient_clause = "tbl_shiftpatientfordoctor.Patient_Id = " + PatientId
+        updatestmt = "update tbl_shiftpatientfordoctor set tbl_shiftpatientfordoctor.attended_Flag = " + AttendFlag + "\
+            where " 
+            
+        patient_clause = ''
+        date_clause = ''
+            
+        if(PatientId != '' and PatientId != '0'):
+            patient_clause = "tbl_shiftpatientfordoctor.Patient_Id = " + PatientId
+            
+        if(CurrentDt != '--' and CurrentDt != ''):
+            date_clause = " and tbl_shiftpatientfordoctor.Shift_Date = '" + CurrentDt + "'"
         
-    if(CurrentDt != '--' and CurrentDt != ''):
-        date_clause = " and tbl_shiftpatientfordoctor.Shift_Date = '" + CurrentDt + "'"
-       
-    final_query = updatestmt + patient_clause + date_clause
-    
-    print(final_query)
-    mycursor.execute(final_query)
-    # print(updatestmt)
-    # mycursor.execute(updatestmt)
-    
-    mydb.commit()
-    return ''
+        final_query = updatestmt + patient_clause + date_clause
+        
+        print(final_query)
+        mycursor.execute(final_query)
+        # print(updatestmt)
+        # mycursor.execute(updatestmt)
+        
+        mydb.commit()
+        return ''
 
 @app.route('/assignShiftfordoctor', methods=["POST"])     
 def create_new_shift_for_doctor():
@@ -210,7 +216,7 @@ def get_all_doctorshift():
     PatientId = request.form.get('PatientId')
     AttendFlag = request.form.get('AttendFlag')
     
-    main_query = "select d.txt_Doctor_Name, s.txt_Shift_Type, sd.Shift_Date, p.txt_Patient_Name, \
+    main_query = "select d.txt_Doctor_Name, s.txt_Shift_Type, DATE_FORMAT(sd.Shift_Date,'%Y/%m/%d') as ShiftDate, p.txt_Patient_Name, \
                   case when sd.attended_Flag = '2' then 'No' when sd.attended_Flag = '1' then 'Yes' end as AttendedFlag, sd.Assign_Id \
                      from tbl_shiftpatientfordoctor sd, tbl_doctor d, tbl_patient p, tbl_shift s \
                      where d.int_Doctor_Id = sd.Doctor_Id and p.int_Patient_Id = sd.Patient_Id and sd.Shift_Id = s.int_Shift_Id"
@@ -262,7 +268,7 @@ def get_doctor_detail():
     for i in myresult:
         logged_doctor_Id = str(i)
         
-    main_query = "select d.txt_Doctor_Name, s.txt_Shift_Type, sd.Shift_Date, p.txt_Patient_Name, \
+    main_query = "select d.txt_Doctor_Name, s.txt_Shift_Type, DATE_FORMAT(sd.Shift_Date,'%Y/%m/%d') as Shift_Date, p.txt_Patient_Name, \
                   case when sd.attended_Flag = '2' then 'No' when sd.attended_Flag = '1' then 'Yes' end as AttendedFlag \
                      from tbl_shiftpatientfordoctor sd, tbl_doctor d, tbl_patient p, tbl_shift s \
                      where d.int_Doctor_Id = sd.Doctor_Id and p.int_Patient_Id = sd.Patient_Id and sd.Shift_Id = s.int_Shift_Id"
@@ -293,7 +299,7 @@ def delete_doctor_shift():
     mycursor.execute(delete_stmt)
     # myresult = mycursor.fetchall()
     
-    main_query = "select d.txt_Doctor_Name, s.txt_Shift_Type, sd.Shift_Date, p.txt_Patient_Name, \
+    main_query = "select d.txt_Doctor_Name, s.txt_Shift_Type, DATE_FORMAT(sd.Shift_Date,'%Y/%m/%d') as Shift_Date, p.txt_Patient_Name, \
                   case when sd.attended_Flag = '2' then 'No' when sd.attended_Flag = '1' then 'Yes' end as AttendedFlag, sd.Assign_Id \
                      from tbl_shiftpatientfordoctor sd, tbl_doctor d, tbl_patient p, tbl_shift s \
                      where d.int_Doctor_Id = sd.Doctor_Id and p.int_Patient_Id = sd.Patient_Id and sd.Shift_Id = s.int_Shift_Id"
@@ -322,7 +328,7 @@ def get_doctor_activity_detail():
     for i in myresult:
         logged_doctor_Id = str(i)
         
-    main_query = "select d.txt_Doctor_Name, s.txt_Shift_Type, da.Activity_Date, p.txt_Patient_Name, \
+    main_query = "select d.txt_Doctor_Name, s.txt_Shift_Type, DATE_FORMAT(da.Activity_Date,'%Y/%m/%d') as Activity_Date, p.txt_Patient_Name, \
                   case when da.Attend_Flag = '2' then 'No' when da.Attend_Flag = '1' then 'Yes' end as AttendedFlag, da.Duration \
                      from tbl_doctoractivity da, tbl_doctor d, tbl_patient p, tbl_shift s \
                      where d.int_Doctor_Id = da.Doctor_Id and da.Shift_Id = s.int_Shift_Id and p.int_Patient_Id = da.Patient_Id"
@@ -382,7 +388,7 @@ def get_nurse_detail():
     for i in myresult:
         logged_nurse_Id = str(i)
         
-    main_query = "select n.txt_Nurse_Name, s.txt_Shift_Type, sn.Shift_Date from tbl_shiftfornurse sn, tbl_nurse n, tbl_shift s \
+    main_query = "select n.txt_Nurse_Name, s.txt_Shift_Type,DATE_FORMAT(sn.Shift_Date,'%Y/%m/%d') as Shift_Date from tbl_shiftfornurse sn, tbl_nurse n, tbl_shift s \
                      where n.int_Nurse_Id = sn.Nurse_Id and sn.Shift_Id = s.int_Shift_Id"
            
     nurse_clause = ''
@@ -421,10 +427,16 @@ def create_new_activity_for_nurse():
     AttendFlag = request.form.get('AttendFlag')
     Duration = request.form.get('Duration')
     ShiftId = request.form.get('ShiftId')
+    today = request.form.get('today')
     
     nurse_activity = [(logged_nurse_Id, CurrentDt, PatientId, AttendFlag, Duration, ShiftId)]
-    stmt = "Insert into tbl_nurseactivity (Nurse_Id, Activity_Date, Patient_Id, Attend_Flag, Duration, Shift_Id) values(%s, %s, %s, %s, %s, %s)"
-    mycursor.executemany(stmt, nurse_activity)
+    date_check = "select Shift_Date from tbl_shiftfornurse where Shift_Date = '" + str(CurrentDt) + "' and Nurse_Id = " + logged_nurse_Id
+    print(date_check)
+    if CurrentDt > today:
+        return 0
+    else:
+        stmt = "Insert into tbl_nurseactivity (Nurse_Id, Activity_Date, Patient_Id, Attend_Flag, Duration, Shift_Id) values(%s, %s, %s, %s, %s, %s)"
+        mycursor.executemany(stmt, nurse_activity)
     
     # updatestmt = "update tbl_shiftfornurse set tbl_shiftfornurse.attended_Flag = " + AttendFlag + "\
     #     where tbl_shiftfornurse.Patient_Id = " + PatientId
@@ -432,8 +444,8 @@ def create_new_activity_for_nurse():
     # print(updatestmt)
     # mycursor.execute(updatestmt)
     
-    mydb.commit()
-    return ''
+        mydb.commit()
+        return ''
 
 @app.route('/loadnurseactivitydetails', methods=["POST","GET"])                 #load nurse activity details         
 def get_nurse_activity_detail():
@@ -452,7 +464,7 @@ def get_nurse_activity_detail():
     for i in myresult:
         logged_nurse_Id = str(i)
         
-    main_query = "select n.txt_Nurse_Name, s.txt_Shift_Type, na.Activity_Date, p.txt_Patient_Name, \
+    main_query = "select n.txt_Nurse_Name, s.txt_Shift_Type,DATE_FORMAT(na.Activity_Date,'%Y/%m/%d') as Activity_Date, p.txt_Patient_Name, \
                   case when na.Attend_Flag = '2' then 'No' when na.Attend_Flag = '1' then 'Yes' end as AttendedFlag, na.Duration \
                      from tbl_nurseactivity na, tbl_nurse n, tbl_patient p, tbl_shift s\
                      where n.int_Nurse_Id = na.Nurse_Id and p.int_Patient_Id = na.Patient_Id and na.Shift_Id = s.int_Shift_Id"
@@ -502,7 +514,7 @@ def get_nurse_activity_detail_summary():
     #tdate_clause = ''
         
     if(ReportType == '1'):
-        main_query1 = "select d.txt_Doctor_Name, s.txt_Shift_Type, da.Activity_Date, p.txt_Patient_Name, \
+        main_query1 = "select d.txt_Doctor_Name, s.txt_Shift_Type, DATE_FORMAT(da.Activity_Date,'%Y/%m/%d') as Activity_Date, p.txt_Patient_Name, \
                     case when da.Attend_Flag = '2' then 'No' when da.Attend_Flag = '1' then 'Yes' end as AttendedFlag, da.Duration \
                     from tbl_doctoractivity da, tbl_shift s, tbl_doctor d, tbl_patient p \
                     where d.int_Doctor_Id = da.Doctor_Id and p.int_Patient_Id = da.Patient_Id and s.int_Shift_Id = da.Shift_Id"
@@ -524,10 +536,10 @@ def get_nurse_activity_detail_summary():
             nurse_activity_details_summary.append(i)
     
     elif(ReportType == '2'):
-        main_query2 = "select n.txt_Nurse_Name, na.Activity_Date, p.txt_Patient_Name, \
+        main_query2 = "select n.txt_Nurse_Name, s.txt_Shift_Type,DATE_FORMAT(na.Activity_Date,'%Y/%m/%d') as Activity_Date, p.txt_Patient_Name, \
                     case when na.Attend_Flag = '2' then 'No' when na.Attend_Flag = '1' then 'Yes' end as AttendedFlag, na.Duration \
-                        from tbl_nurseactivity na, tbl_nurse n, tbl_patient p \
-                        where n.int_Nurse_Id = na.Nurse_Id and p.int_Patient_Id = na.Patient_Id"
+                        from tbl_nurseactivity na, tbl_shift s, tbl_nurse n, tbl_patient p \
+                        where n.int_Nurse_Id = na.Nurse_Id and p.int_Patient_Id = na.Patient_Id and s.int_Shift_Id = na.Shift_Id"
                 
         if(NurseId != '0' and NurseId != ''):
             nurse_clause = ' and n.int_Nurse_Id = '+ NurseId 
@@ -546,16 +558,17 @@ def get_nurse_activity_detail_summary():
             nurse_activity_details_summary.append(i)
        
     elif(ReportType == '3'):
-        main_query3 = "select d.txt_Doctor_Name, da.Activity_Date, p.txt_Patient_Name, \
+        main_query3 = "select d.txt_Doctor_Name, DATE_FORMAT(da.Activity_Date,'%Y/%m/%d') as Activity_Date, p.txt_Patient_Name, \
                     case when da.Attend_Flag = '2' then 'No' when da.Attend_Flag = '1' then 'Yes' end as AttendedFlag, da.Duration \
                         from tbl_doctoractivity da, tbl_doctor d, tbl_patient p \
-                        where d.int_Doctor_Id = da.Doctor_Id and p.int_Patient_Id = da.Patient_Id"
+                        where d.int_Doctor_Id = da.Doctor_Id and p.int_Patient_Id = da.Patient_Id \
+                        having sum(da.Duration) > 2450"
                 
         if(DoctorId != '0' and DoctorId != ''):
             doctor_clause = ' and d.int_Doctor_Id = '+ DoctorId 
         
         if(FromDt != '--' and FromDt != ''):
-            fdate_clause = ' and na.Activity_Date between "'+ FromDt + '" and "' + ToDt + '"'
+            fdate_clause = ' and da.Activity_Date between "'+ FromDt + '" and "' + ToDt + '"'
             
         # if(ToDt != '0' and ToDt != ''):
         #     tdate_clause = ' and p.int_Patient_Id = '+ ToDt 
@@ -568,10 +581,10 @@ def get_nurse_activity_detail_summary():
             nurse_activity_details_summary.append(i)
        
     elif(ReportType == '4'):
-        main_query4 = "select d.txt_Doctor_Name, da.Activity_Date, p.txt_Patient_Name, \
+        main_query4 = "select d.txt_Doctor_Name, DATE_FORMAT(da.Activity_Date,'%Y/%m/%d') as Activity_Date, p.txt_Patient_Name, \
                     case when da.Attend_Flag = '2' then 'No' when da.Attend_Flag = '1' then 'Yes' end as AttendedFlag, da.Duration \
                         from tbl_doctoractivity da, tbl_doctor d, tbl_patient p \
-                        where d.int_Doctor_Id = da.Doctor_Id and p.int_Patient_Id = da.Patient_Id"
+                        where d.int_Doctor_Id = da.Doctor_Id and p.int_Patient_Id = da.Patient_Id and da.Duration < 1920"
                 
         if(DoctorId != '0' and DoctorId != ''):
             doctor_clause = ' and d.int_Doctor_Id = '+ DoctorId 
@@ -610,7 +623,7 @@ def get_all_nurse_shift():
     ShiftId = request.form.get('ShiftId')
     ShiftDt = request.form.get('ShiftDt') #CAST(sn.Shift_Date AS date) as Sdate
     
-    main_query = "select n.txt_Nurse_Name, s.txt_Shift_Type, sn.Shift_Date AS sdate \
+    main_query = "select n.txt_Nurse_Name, s.txt_Shift_Type, DATE_FORMAT(sn.Shift_Date,'%Y/%m/%d') as ShiftDate \
                         from tbl_shiftfornurse sn, tbl_nurse n, tbl_shift s \
                         where n.int_Nurse_Id = sn.Nurse_Id and sn.Shift_Id = s.int_Shift_Id"       
     nurse_clause = ''
