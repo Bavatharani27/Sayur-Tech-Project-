@@ -3,6 +3,10 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="https://code.jquery.com/jquery-3.6.1.js"></script>
+<!--For Custome Alert-->
+<script src= "https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src= "https://cdn.jsdelivr.net/npm/sweetalert2@11.4.8/dist/sweetalert2.all.min.js"></script>
+
 <script>
     $(document).ready(function () {
         $('#btnLogin').click(function(e){
@@ -13,18 +17,18 @@
           var login_url = "/userlogin";
           $.ajax({
               url: login_url,
-            //  data:loginUser, 
-            //  datatype: "json",
-           //   type: 'POST',
+              data:loginUser, 
+              datatype: "json",
+              type: 'POST',
               success:function(r){
                 for(var index in r){
-                  if(r[index][0] == username && r[index][1] == password){
-                    location.href = ('/admin');
+                  if(r[index][1] == username && r[index][2] == password){
+                      location.href = ('/admin');
                   }
                 }
               },
               error:function(r){
-                  alert("error");
+                Swal.fire("Incorrect User name or Password");
               }
           });
         });
