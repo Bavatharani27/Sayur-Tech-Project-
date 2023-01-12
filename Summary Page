@@ -9,9 +9,29 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/free-jqgrid/4.15.5/jquery.jqgrid.min.js"></script>
     <script>
+        function formatDate(date) {
+            var d = new Date(date),
+                month = '' + (d.getMonth() + 1),
+                day = '' + d.getDate(),
+                year = d.getFullYear();
+        
+            if (month.length < 2) 
+                month = '0' + month;
+            if (day.length < 2) 
+                day = '0' + day;
+        
+            return [year, month, day].join('-');
+        }
+    </script>
+    <script>
         $(document).ready(function () {
             //$('#lbldoctor').hide();
             //$('#doctorId').hide();
+            $('#todate').on('change', function(){
+                debugger;
+                var dt = this.value;
+                formatDate(dt);
+            });
             $('#lblnurse').hide();
             $('#nurseId').hide();
             $("#doctorId").val(function(){
@@ -46,6 +66,8 @@
                 $('#tblNurseDetails').GridUnload("");  
                 $('#lbldoctor').hide();
                 $('#doctorId').hide();
+                $('#lblnurse').hide();
+                $('#nurseId').hide();
             });
             $('#btnSearch').click(function(e){
                 $('#tblNurseDetails').GridUnload(""); 
@@ -56,25 +78,43 @@
                 FromDt = FromDt.substring(0,4) + '-'+ FromDt.substring(5,7) +'-'+ FromDt.substring(8,10);
                 var ToDt = $('#todate').val();
                 ToDt = ToDt.substring(0,4) + '-'+ ToDt.substring(5,7) +'-'+ ToDt.substring(8,10);
+                if(ReportType == null){
+                    Swal.fire("Please select report type");
+                    return false;
+                }
                 if(FromDt == "--" || ToDt == "--"){
                     Swal.fire("From Date & To Date is Mandatory");
                     return false;
                 }
                 var nurse_activity_details_summary = {'ReportType':ReportType, 'DoctorId':DoctorId, 'NurseId':NurseId, 'FromDt':FromDt, 'ToDt':ToDt};
-                $('#tblNurseDetails').jqGrid({
-                    url:'/loadnursedetailsummary',
-                    postData: nurse_activity_details_summary,
-                    datatype: "json",
-                    mtype: 'POST',
-                    loadonce: true,
-                    gridview: true,
-                    colModel:[{name:'Name', align:'center'}, 
-                            {name:'Shift Type', width: 70,align:'center'},
-                            {name: 'Date', width: 165, align:'center'},
-                            {name: 'Patient Name', align:'center'},
-                            {name: 'Attended the patient', align:'center'}, 
-                            {name: 'Duration', width: 70,align:'center'}]
-                });
+                if(ReportType == '1' || ReportType == '2'){
+                    $('#tblNurseDetails').jqGrid({
+                        url:'/loadnursedetailsummary',
+                        postData: nurse_activity_details_summary,
+                        datatype: "json",
+                        mtype: 'POST',
+                        loadonce: true,
+                        gridview: true,
+                        colModel:[{name:'Name', align:'center'}, 
+                                {name:'Shift Type', width: 70,align:'center'},
+                                {name: 'Date', width: 165, align:'center'},
+                                {name: 'Patient Name', align:'center'},
+                                {name: 'Attended the patient', align:'center'}, 
+                                {name: 'Duration', width: 70,align:'center'}]
+                    });
+                }
+                if(ReportType == '3' || ReportType == '4' || ReportType == '5' || ReportType == '6'){
+                    $('#tblNurseDetails').jqGrid({
+                        url:'/loadnursedetailsummary',
+                        postData: nurse_activity_details_summary,
+                        datatype: "json",
+                        mtype: 'POST',
+                        loadonce: true,
+                        gridview: true,
+                        colModel:[{name:'Name', width: 350,align:'center'},
+                                {name: 'Duration', width: 350,align:'center'}]
+                    });
+                }
             });
         });
     </script>
@@ -217,7 +257,7 @@
           box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
         }
         .grid {
-            position:absolute; left:100px; top:260px;
+            position:absolute; left:150px; top:260px;
         }
     </style>
     <title>Summary</title>
@@ -242,7 +282,7 @@
                 $('#nurseId').val('');
                 $('#nurseId').hide();
             }
-            if(mylist == '2'){
+            if(mylist == '2' || mylist == '5' || mylist == '6'){
                 $('#lbldoctor').hide();
                 $('#doctorId').val('');
                 $('#doctorId').hide();
@@ -250,6 +290,7 @@
                 $('#nurseId').val('');
                 $('#nurseId').show();
             }
+            
         }
     </script>
 </head>
@@ -260,15 +301,17 @@
             <select id = "myList" onChange = "favTutorial()" class="select">
                 <option value="1"> Doctor Details </option>
                 <option value="2"> Nurse Details </option>
-                <option value="3"> Unworked Doctor Details </option>
-                <option value="4"> OverWorked Doctor Details </option>
+                <option value="3"> Under worked Doctor Details </option>
+                <option value="4"> Over Worked Doctor Details </option>
+                <option value="5"> Under worked Nurse Details </option>
+                <option value="6"> Over Worked Nurse Details </option>
             </select>
 
             <label style="position:absolute; left:370px; top:130px;"><b>From Date</b></label><br><br> 
             <input type="date" id="fromdate" class="fromdate">
 
             <label style="position:absolute; left:645px; top:130px;"><b>To Date</b></label><br><br> 
-            <input type="date"  id="todate" class="todate">
+            <input type="date"  id="todate" class="todate" placeholder="dd-mm-yyyy" value="" min="1997-01-01" max="2030-12-31">
 
             <label style="position:absolute; left:900px; top:130px;" id="lbldoctor"><b>Doctor</b></label><br><br>
             <select name="doctor" id="doctorId" class="doctorId"> </select>
