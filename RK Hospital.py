@@ -25,7 +25,10 @@ def login():
     myresult = mycursor.fetchall()
     for i in myresult:
         User.append(i)
-    return User 
+    if login_username not in User[0][1] or login_password not in User[0][2]:
+        return 0
+    else:
+        return User 
 #login()      
 @app.route('/login')
 def get_login_page():
@@ -558,22 +561,20 @@ def get_nurse_activity_detail_summary():
             nurse_activity_details_summary.append(i)
        
     elif(ReportType == '3'):
-        main_query3 = "select d.txt_Doctor_Name, DATE_FORMAT(da.Activity_Date,'%Y/%m/%d') as Activity_Date, p.txt_Patient_Name, \
-                    case when da.Attend_Flag = '2' then 'No' when da.Attend_Flag = '1' then 'Yes' end as AttendedFlag, da.Duration \
-                        from tbl_doctoractivity da, tbl_doctor d, tbl_patient p \
-                        where d.int_Doctor_Id = da.Doctor_Id and p.int_Patient_Id = da.Patient_Id \
-                        having sum(da.Duration) > 2450"
+        main_query3 = "select d.txt_Doctor_Name, sum(da.Duration) as Duration \
+                        from tbl_doctoractivity da left outer join tbl_doctor d on d.int_Doctor_Id = da.Doctor_Id where "
                 
-        if(DoctorId != '0' and DoctorId != ''):
-            doctor_clause = ' and d.int_Doctor_Id = '+ DoctorId 
+        # if(DoctorId != '0' and DoctorId != ''):
+        #     doctor_clause = ' d.int_Doctor_Id = '+ DoctorId 
         
         if(FromDt != '--' and FromDt != ''):
-            fdate_clause = ' and da.Activity_Date between "'+ FromDt + '" and "' + ToDt + '"'
+            fdate_clause = ' da.Activity_Date between "'+ FromDt + '" and "' + ToDt + '"'
             
-        # if(ToDt != '0' and ToDt != ''):
-        #     tdate_clause = ' and p.int_Patient_Id = '+ ToDt 
+        if(DoctorId != '0' and DoctorId != ''):
+            doctor_clause = ' and d.int_Doctor_Id = '+ DoctorId 
             
-        final_query3 = main_query3 + nurse_clause + fdate_clause #+ tdate_clause 
+        having_clause = ' group by d.txt_Doctor_Name having sum(da.Duration) < 1920'
+        final_query3 = main_query3 + fdate_clause + doctor_clause + having_clause 
         print(final_query3)
         mycursor.execute(final_query3)
         myresult = mycursor.fetchall()
@@ -581,23 +582,57 @@ def get_nurse_activity_detail_summary():
             nurse_activity_details_summary.append(i)
        
     elif(ReportType == '4'):
-        main_query4 = "select d.txt_Doctor_Name, DATE_FORMAT(da.Activity_Date,'%Y/%m/%d') as Activity_Date, p.txt_Patient_Name, \
-                    case when da.Attend_Flag = '2' then 'No' when da.Attend_Flag = '1' then 'Yes' end as AttendedFlag, da.Duration \
-                        from tbl_doctoractivity da, tbl_doctor d, tbl_patient p \
-                        where d.int_Doctor_Id = da.Doctor_Id and p.int_Patient_Id = da.Patient_Id and da.Duration < 1920"
-                
-        if(DoctorId != '0' and DoctorId != ''):
-            doctor_clause = ' and d.int_Doctor_Id = '+ DoctorId 
+        main_query4 = "select d.txt_Doctor_Name, sum(da.Duration) as Duration \
+                        from tbl_doctoractivity da left outer join tbl_doctor d on d.int_Doctor_Id = da.Doctor_Id where "
         
         if(FromDt != '--' and FromDt != ''):
-            fdate_clause = ' and na.Activity_Date between "'+ FromDt + '" and "' + ToDt + '"'
+            fdate_clause = ' da.Activity_Date between "'+ FromDt + '" and "' + ToDt + '"'
             
-        # if(ToDt != '0' and ToDt != ''):
-        #     tdate_clause = ' and p.int_Patient_Id = '+ ToDt 
+        if(DoctorId != '0' and DoctorId != ''):
+            doctor_clause = ' and d.int_Doctor_Id = '+ DoctorId 
             
-        final_query4 = main_query4 + nurse_clause + fdate_clause #+ tdate_clause 
+        having_clause = ' group by d.txt_Doctor_Name having sum(da.Duration) > 2430'            
+        final_query4 = main_query4 + fdate_clause + doctor_clause + having_clause 
         print(final_query4)
         mycursor.execute(final_query4)
+        myresult = mycursor.fetchall()
+        for i in myresult:
+            nurse_activity_details_summary.append(i)
+        
+    elif(ReportType == '5'):
+        main_query5 = "select n.txt_Nurse_Name, sum(na.Duration ) as Duration from tbl_nurseactivity na \
+                    left outer join tbl_nurse n on n.int_Nurse_Id = na.Nurse_Id where " 
+                
+        if(FromDt != '--' and FromDt != ''):
+            fdate_clause = ' na.Activity_Date between "'+ FromDt + '" and "' + ToDt + '"'
+        
+        if(NurseId != '0' and NurseId != ''):
+             nurse_clause = ' and n.int_Nurse_Id = '+ NurseId 
+        
+        having_clause = " group by n.txt_Nurse_Name having sum(na.Duration) < 720"    
+        
+        final_query5 = main_query5 + fdate_clause + nurse_clause + having_clause 
+        print(final_query5)
+        mycursor.execute(final_query5)
+        myresult = mycursor.fetchall()
+        for i in myresult:
+            nurse_activity_details_summary.append(i)
+        
+    elif(ReportType == '6'):
+        main_query6 = "select n.txt_Nurse_Name, sum(na.Duration) \
+                        from tbl_nurseactivity na left outer join tbl_nurse n on n.int_Nurse_Id = na.Nurse_Id where "
+                
+        if(FromDt != '--' and FromDt != ''):
+            fdate_clause = ' na.Activity_Date between "'+ FromDt + '" and "' + ToDt + '"'
+        
+        if(NurseId != '0' and NurseId != ''):
+             nurse_clause = ' and n.int_Nurse_Id = '+ NurseId 
+             
+        having_clause = " group by n.txt_Nurse_Name having sum(na.Duration) > 1200"    
+        
+        final_query6 = main_query6 + fdate_clause + nurse_clause + having_clause 
+        print(final_query6)
+        mycursor.execute(final_query6)
         myresult = mycursor.fetchall()
         for i in myresult:
             nurse_activity_details_summary.append(i)
