@@ -165,30 +165,33 @@ def create_new_activity_for_doctor():
     today = request.form.get('today')
     
     doctor_activity = [(logged_doctor_Id, CurrentDt, PatientId, AttendFlag, Duration, ShiftId)]
-    date_check = "select Shift_Date from tbl_shiftpatientfordoctor where Shift_Date = '" + str(CurrentDt) + "' and Nurse_Id = " + logged_doctor_Id
-    print(date_check)
-    if CurrentDt > today:
+    date_check = "select Shift_Date from tbl_shiftpatientfordoctor where Shift_Date = '" + str(CurrentDt) + "' and Doctor_Id = " + logged_doctor_Id
+    mycursor.execute(date_check)
+    myresult = mycursor.fetchone()
+    print(myresult)
+    if myresult == None: # > today:
         return 0
     else:
-        stmt = "Insert into tbl_doctoractivity (Doctor_Id, Activity_Date, Patient_Id, Attend_Flag, Duration, Shift_Id) values(%s, %s, %s, %s, %s, %s)"
-        mycursor.executemany(stmt, doctor_activity)
+        stmt = mycursor.callproc("doctor_activity_save", (logged_doctor_Id, CurrentDt, PatientId, AttendFlag, Duration, ShiftId))
+        # stmt = "Insert into tbl_doctoractivity (Doctor_Id, Activity_Date, Patient_Id, Attend_Flag, Duration, Shift_Id) values(%s, %s, %s, %s, %s, %s)"
+        # mycursor.executemany(stmt, doctor_activity)
         
-        updatestmt = "update tbl_shiftpatientfordoctor set tbl_shiftpatientfordoctor.attended_Flag = " + AttendFlag + "\
-            where " 
+        # updatestmt = "update tbl_shiftpatientfordoctor set tbl_shiftpatientfordoctor.attended_Flag = " + AttendFlag + "\
+        #     where " 
             
-        patient_clause = ''
-        date_clause = ''
+        # patient_clause = ''
+        # date_clause = ''
             
-        if(PatientId != '' and PatientId != '0'):
-            patient_clause = "tbl_shiftpatientfordoctor.Patient_Id = " + PatientId
+        # if(PatientId != '' and PatientId != '0'):
+        #     patient_clause = "tbl_shiftpatientfordoctor.Patient_Id = " + PatientId
             
-        if(CurrentDt != '--' and CurrentDt != ''):
-            date_clause = " and tbl_shiftpatientfordoctor.Shift_Date = '" + CurrentDt + "'"
+        # if(CurrentDt != '--' and CurrentDt != ''):
+        #     date_clause = " and tbl_shiftpatientfordoctor.Shift_Date = '" + CurrentDt + "'"
         
-        final_query = updatestmt + patient_clause + date_clause
+        # final_query = updatestmt + patient_clause + date_clause
         
-        print(final_query)
-        mycursor.execute(final_query)
+        # print(final_query)
+        # mycursor.execute(final_query)
         # print(updatestmt)
         # mycursor.execute(updatestmt)
         
@@ -205,8 +208,11 @@ def create_new_shift_for_doctor():
     AttendFlag = request.form.get('AttendFlag')
     
     doctor_shift = [(DocId, ShiftId, ShiftDt, PatientId, AttendFlag)]
-    stmt = "Insert into tbl_shiftpatientfordoctor (Doctor_Id, Shift_Id, Shift_Date, Patient_Id, attended_Flag) values(%s, %s, %s, %s, %s)"
-    mycursor.executemany(stmt, doctor_shift)
+    stmt = mycursor.callproc("assign_shift_doctor", (DocId, ShiftId, ShiftDt, PatientId, AttendFlag))
+    # for result in stmt.stored_results():
+    #     print(result.fetchall())
+    # stmt = "Insert into tbl_shiftpatientfordoctor (Doctor_Id, Shift_Id, Shift_Date, Patient_Id, attended_Flag) values(%s, %s, %s, %s, %s)"
+    # mycursor.executemany(stmt, doctor_shift)
     mydb.commit()
     return ''
 
@@ -246,7 +252,7 @@ def get_all_doctorshift():
         attendFlag_clause = ' and sd.attended_Flag = '+ AttendFlag 
         
     final_query = main_query + doctor_clause + shift_clause + date_clause + patient_clause + attendFlag_clause
-    
+    print(final_query)
     mycursor.execute(final_query)
     myresult = mycursor.fetchall()
     for i in myresult:
@@ -313,6 +319,24 @@ def delete_doctor_shift():
         updated_grid.append(i)
     return updated_grid
     
+@app.route('/deletedoctoractivity/<int:DocActivityId>')              #Delete doctor activity
+def delete_doctor_activity():
+    # updated_grid = []
+    DocActivityId = request.get.form('DocActivityId')
+    delete_stmt = "DELETE FROM tbl_doctoractivity WHERE Doctor_Activity_Id = " + DocActivityId
+    mycursor.execute(delete_stmt)
+    # myresult = mycursor.fetchall()
+    get_doctor_activity_detail()
+    # main_query = "select d.txt_Doctor_Name, s.txt_Shift_Type, DATE_FORMAT(sd.Shift_Date,'%Y/%m/%d') as Shift_Date, p.txt_Patient_Name, \
+    #               case when sd.attended_Flag = '2' then 'No' when sd.attended_Flag = '1' then 'Yes' end as AttendedFlag, sd.Assign_Id \
+    #                  from tbl_shiftpatientfordoctor sd, tbl_doctor d, tbl_patient p, tbl_shift s \
+    #                  where d.int_Doctor_Id = sd.Doctor_Id and p.int_Patient_Id = sd.Patient_Id and sd.Shift_Id = s.int_Shift_Id"
+                     
+    # mycursor.execute(main_query)
+    # myresult = mycursor.fetchall()
+    # for i in myresult:
+    #     updated_grid.append(i)
+    # return updated_grid
 
 @app.route('/loaddoctoractivitydetails', methods=["POST","GET"])                 #load doctor activity details         
 def get_doctor_activity_detail():
@@ -434,12 +458,19 @@ def create_new_activity_for_nurse():
     
     nurse_activity = [(logged_nurse_Id, CurrentDt, PatientId, AttendFlag, Duration, ShiftId)]
     date_check = "select Shift_Date from tbl_shiftfornurse where Shift_Date = '" + str(CurrentDt) + "' and Nurse_Id = " + logged_nurse_Id
+    # print(date_check)
+    # if CurrentDt > today:
+    #     return 0
     print(date_check)
-    if CurrentDt > today:
+    mycursor.execute(date_check)
+    myresult = mycursor.fetchone()
+    print(myresult)
+    if myresult == None: # > today:
         return 0
     else:
-        stmt = "Insert into tbl_nurseactivity (Nurse_Id, Activity_Date, Patient_Id, Attend_Flag, Duration, Shift_Id) values(%s, %s, %s, %s, %s, %s)"
-        mycursor.executemany(stmt, nurse_activity)
+        stmt = mycursor.callproc("nurse_activity_save", (logged_nurse_Id, CurrentDt, PatientId, AttendFlag, Duration, ShiftId))
+        # stmt = "Insert into tbl_nurseactivity (Nurse_Id, Activity_Date, Patient_Id, Attend_Flag, Duration, Shift_Id) values(%s, %s, %s, %s, %s, %s)"
+        # mycursor.executemany(stmt, nurse_activity)
     
     # updatestmt = "update tbl_shiftfornurse set tbl_shiftfornurse.attended_Flag = " + AttendFlag + "\
     #     where tbl_shiftfornurse.Patient_Id = " + PatientId
@@ -646,8 +677,9 @@ def create_new_shift_for_nurse():
     ShiftId = request.form.get('ShiftId')
     ShiftDt = request.form.get('ShiftDt')
     nurse_shift = [(NurseId, ShiftId, ShiftDt)]
-    stmt = "Insert into tbl_shiftfornurse (Nurse_Id, Shift_Id, Shift_Date) values(%s, %s, %s)"
-    mycursor.executemany(stmt, nurse_shift)
+    stmt = mycursor.callproc("assign_shift_nurse", (NurseId, ShiftId, ShiftDt))
+    # stmt = "Insert into tbl_shiftfornurse (Nurse_Id, Shift_Id, Shift_Date) values(%s, %s, %s)"
+    # mycursor.executemany(stmt, nurse_shift)
     mydb.commit()
     return ''
 
